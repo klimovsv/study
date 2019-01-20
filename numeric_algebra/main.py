@@ -2,42 +2,51 @@ from Matrix import *
 import numpy as np
 import math
 import sys
-e = 10 ** -1
+
+# eps = 10 ** -1
 iter = 15
+eps = 0.01
+eps_u = 0.01
 
 
-def equals(a: float, b: float):
-    return math.fabs(a - b) <= e
+def equals(a: float, b: float, eps):
+    return math.fabs(a - b) <= eps
 
 
 def step_outside(start, diag, p, u, depth):
+    d = diag[0] if p > 0 else diag[len(diag) - 1]
+
     if depth == iter:
+        return start
+
+    if equals(start, d, eps):
+        print("EQEQEQEQEQE")
         return start
 
     def f(l):
         res = 0
         for i in range(len(diag)):
-            res += u[i] ** 2 / (diag[i] - l)
+            res += get_u(u, i) ** 2 / (diag[i] - l)
         return 1 + res * p
 
     def f_der(l):
         res = 0
         for i in range(len(diag)):
-            res += u[i] ** 2 / (diag[i] - l) ** 2
+            res += get_u(u, i) ** 2 / ((diag[i] - l) ** 2)
         return res * p
-
-    d = diag[0] if p > 0 else diag[len(diag) - 1]
 
     # c1+c2/(d-l) = f
     # c2/(d-l)^2 = f'
 
     # c2 = f'*(d-l)^2
     # c1 = f - f'*(d-l)
-    c1 = f(start) - f_der(start) * (d - start)
     c2 = f_der(start) * (d - start) ** 2
+    c1 = f(start) - c2 / (d - start)
 
-    next = c2 / c1 + d
+    next = (c2 / c1) + d
 
+    # print("OUTSIDE ",start,next,d,p,c1,c2)
+    # print(diag)
     return step_outside(next, diag, p, u, depth + 1)
 
     # c1 + c2/(d - l) = 0
@@ -50,7 +59,7 @@ def step_inside(start, diag, p, u, depth):
         k = s
         res = 0
         while k <= e:
-            res += u[k] ** 2 / (diag[k] - l)
+            res += get_u(u, k) ** 2 / (diag[k] - l)
             k += 1
         return res * p
 
@@ -58,7 +67,7 @@ def step_inside(start, diag, p, u, depth):
         k = s
         res = 0
         while k <= e:
-            res += u[k] ** 2 / ((diag[k] - l) ** 2)
+            res += get_u(u, k) ** 2 / ((diag[k] - l) ** 2)
             k += 1
         return res * p
 
@@ -71,6 +80,13 @@ def step_inside(start, diag, p, u, depth):
         l = start[i]
         di = diag[i]
         di_1 = diag[i + 1]
+
+        if equals(di, di_1, 2 * eps):
+            next.append(l)
+            continue
+        elif equals(l, di_1, eps) or equals(l, di, eps):
+            next.append(l)
+            continue
 
         c1 = phi_der(0, i, l) * ((di - l) ** 2)
         c1_ = phi(0, i, l) - phi_der(0, i, l) * (di - l)
@@ -85,9 +101,9 @@ def step_inside(start, diag, p, u, depth):
         x1 = (-b + discr) / (2 * a)
         x2 = (-b - discr) / (2 * a)
         # print(x1, x2)
-        if di_1 <= x1 <= di:
+        if di_1 < x1 < di:
             next.append(x1)
-        elif di_1 <= x2 <= di:
+        elif di_1 < x2 < di:
             next.append(x2)
         else:
             next.append(l)
@@ -101,41 +117,89 @@ def step_inside(start, diag, p, u, depth):
 
 def century_eq(D, p, u):
     diag = [D.matr[i, i] for i in range(D.matr.shape[0])]
-    u = [u.matr[i, 0] for i in range(u.matr.shape[0])]
+    # u = [u.matr[i, 0] for i in range(u.matr.shape[0])]
 
-    if p < 0:
-        print("ALERT")
-
+    nu = [u.matr[i, 0] for i in range(u.matr.shape[0])]
+    norm = sum(map(lambda a: a ** 2, nu))
     start = []
     for i in range(len(diag) - 1):
         start.append((diag[i] + diag[i + 1]) / 2)
 
     if p > 0:
-        return [step_outside(diag[0] + 1, diag, p, u, 0)] + step_inside(start, diag, p, u, 0)
+        return [step_outside(diag[0] + 100, diag, p, u, 0)] + step_inside(start, diag, p, u, 0)
     else:
-        return step_inside(start, diag, p, u, 0) + [step_outside(diag[len(diag) - 1] - 1, diag, p, u, 0)]
+        return step_inside(start, diag, p, u, 0) + [step_outside(diag[len(diag) - 1] - 100, diag, p, u, 0)]
 
 
-def generate_w(alphas, diag, p):
+def get_j(i, lst):
+    n = 0
+    for j in range(len(lst)):
+        for el in lst[j]:
+            if n == i:
+                return j
+            n += 1
+
+
+def generate_w(alphas, diag, p, l, k, groups_diag):
     length = len(diag)
     w = [None for i in range(length)]
 
     for i in range(length):
-        d = diag[i]
-        top = 1
+        j = get_j(i, groups_diag)
+        kdj = len(groups_diag[j])
+        if kdj == 1 and l[j] >= kdj:
+            w[i] = 0
+        elif l[j] > kdj - 1 > 0:
+            w[i] = 0
+        elif l[j] == kdj - 1 and kdj - 1 > 0:
+            pass
+        elif l[j] == 0 and kdj == 1:
+            d = diag[i]
+            top = 1
 
-        bot = 1
+            bot = 1
+            res = 1
 
-        for j in range(length):
-            top = top * (alphas[j] - d)
+            for n in range(length):
+                if n != i:
+                    res = res * (alphas[n] - d) / (diag[n] - d)
 
-        for j in range(length):
-            if j != i:
-                bot = bot * (diag[j] - d)
+            res *= alphas[i] - d
 
-        w[i] = math.sqrt(top / bot)
+            # for n in range(length):
+            #     top = top * (alphas[n] - d)
+            #
+            # for n in range(length):
+            #     if n != i:
+            #         bot = bot * (diag[n] - d)
+
+            if p < 0:
+                # top = -top
+                res = -res
+
+            # w[i] = math.sqrt(top / bot)
+
+            w[i] = math.sqrt(res)
 
     return w
+
+def find_equals(alph, i,diag,p):
+    lst = []
+    if equals(alph, diag[i], eps):
+        lst.append(i)
+    if p > 0:
+        if i > 0 and equals(alph, diag[i - 1], eps):
+            lst.append(i - 1)
+    else:
+        if i < len(diag) - 1 and equals(alph, diag[i + 1], eps):
+            lst.append(i + 1)
+    return lst
+
+def get_u(u, i):
+    if equals(u.matr[i, 0], 0, eps_u):
+        return 0
+    else:
+        return u.matr[i, 0]
 
 
 def spectral(m: Matrix) -> [Matrix, Matrix]:
@@ -148,16 +212,77 @@ def spectral(m: Matrix) -> [Matrix, Matrix]:
 
     D = Matrix.diagonaled(l1, l2)
     Q = Matrix.diagonaled(q1, q2)
-    u = Q.transpose() * v
     perm = D.sort()
+    u = Q.transpose() * v
 
+    # print(D)
     diag = perm * D * perm.transpose()
     # print(diag)
-    alphas = century_eq(perm * D * perm.transpose(), b, perm * u)
+    u = perm * u
+
+    n_diag = [diag.matr[i, i] for i in range(diag.matr.shape[0])]
+    groups_diag = []
+    i = 0
+    while i < len(n_diag):
+        el = n_diag[i]
+        eq = [el]
+        while i + 1 < len(n_diag) and equals(el, n_diag[i + 1], 2 * eps):
+            eq.append(n_diag[i + 1])
+            i += 1
+        groups_diag.append(eq)
+        i += 1
+
+    # print(n_diag)
+    # print(groups_diag)
+
+    k = []
+    i = 0
+    for group in groups_diag:
+        res = 0
+        for d in group:
+            res += get_u(u, i) ** 2
+            i += 1
+        k.append(res)
+
+    # print(k)
+
+    alphas = century_eq(diag, b, u)
+
+    l = []
+
+    def f(l):
+        res = 0
+        for i in range(len(n_diag)):
+            res += get_u(u, i) ** 2 / (n_diag[i] - l)
+        return 1 + res * b
+
+    for i in range(len(groups_diag)):
+        count = 0
+        for alph in alphas:
+            if equals(groups_diag[i][0], alph, eps):
+                count += 1
+
+        l.append(count)
+        # if k[i] != 0:
+        #     l.append(len(groups_diag[i]) - 1)
+        # else:
+        #     if equals(f(groups_diag[i][0]), 0, eps):
+        #         l.append(len(groups_diag[i]) + 1)
+        #     else:
+        #         l.append(len(groups_diag[i]))
 
     diag = [diag.matr[i, i] for i in range(diag.matr.shape[0])]
 
-    w = Matrix.vector(generate_w(alphas, diag, b))
+    print("u ", u)
+    print("k ", k)
+    print("l ", l)
+    print("d ", diag)
+    print("alph ", alphas)
+    print("perm ", perm)
+
+    w = Matrix.vector(generate_w(alphas, diag, b, l, k, groups_diag))
+    # print(l)
+    # print(w)
     eign_matr = Matrix.zeros(len(alphas))
     E = Matrix.identity(len(alphas))
 
@@ -167,39 +292,79 @@ def spectral(m: Matrix) -> [Matrix, Matrix]:
         if sign_u != sign_w:
             w.matr[i, 0] = -1 * w.matr[i, 0]
 
+
+    p = b
+    D = perm * D * perm.transpose()
     for i in range(len(alphas)):
-        vec = []
-        for j in range(D.matr.shape[0]):
-            vec.append(w.matr[j, 0] / (D.matr[j, j] - alphas[i]))
+        # j = get_j(i, groups_diag)
+        # kij = len(groups_diag[j])
+        alpha = alphas[i]
+        eq_ind = find_equals(alpha, i,diag,p)
 
-        # max = vec[0]
-        # ind = 0
-        # for i in range(len(vec)):
-        #     if vec[i] > max:
-        #         ind = i
-        #         max = vec[i]
+        if len(eq_ind) == 0:
+            vec = []
+            for j in range(D.matr.shape[0]):
+                vec.append(w.matr[j, 0] / (D.matr[j, j] - alphas[i]))
+
+            eign_matr.set_vector_eign(vec, i)
+        else:
+            j = get_j(eq_ind[0], groups_diag)
+            kij = len(groups_diag[j])
+            if l[j] == kij:
+                n = eq_ind[0]
+                eign_matr.set_vector(E.getCol(n), i)
+            elif l[j] == kij + 1:
+                dij = groups_diag[j][0]
+                if equals(diag[i], dij, 2 * eps):
+
+                    eign_matr.set_vector(E.getCol(i), i)
+                else:
+                    z = [None for i in range(alphas)]
+                    for n in range(len(z)):
+                        if equals(diag[n], dij, 2 * eps):
+                            z[n] = 0
+                        else:
+                            z[n] = w.matr[n, 0] / (D.matr[n, n] - dij)
+                    eign_matr.set_vector_eign(z, i)
+            # elif l[j] == kij - 1:
+            #     local_w = [None for i in range(alphas)]
+            #     dij = groups_diag[j][0]
+            #     for i in range(len(diag)):
+            #         n_j = get_j(i,groups_diag)
+
+
+        # if equals(alphas[i], diag[i], eps) and l[j] == kij:
+        #     eign_matr.set_vector(E.getCol(i), i)
+        # else:
+        #     vec = []
+        #     for j in range(D.matr.shape[0]):
+        #         vec.append(w.matr[j, 0] / (D.matr[j, j] - alphas[i]))
         #
-        # factor = (D.matr[ind, ind] - alphas[i])
-        #
-        # vec = []
-        # for j in range(D.matr.shape[0]):
-        #     vec.append(factor * w.matr[j, 0] / (D.matr[j, j] - alphas[i]))
+        #     eign_matr.set_vector_eign(vec, i)
 
-        eign_matr.set_vector_eign(vec, i)
+    # for i in range(len(alphas)):
+    #     print("norm ",np.linalg.norm(eign_matr.getCol(i)))
 
-        if equals(u.matr[i, 0], 0):
-            eign_matr.set_vector(E.getCol(i) , i)
+    # if equals(u.matr[i, 0], 0, eps):
+    #     eign_matr.set_vector(E.getCol(i), i)
 
     L = Matrix.diag_from_vector(alphas)
 
-    print()
-    print("d ", diag)
-    print("alph ", alphas)
+    # print()
+    #
+
     print(eign_matr)
     print(eign_matr * eign_matr.transpose())
     print(np.linalg.det((eign_matr * eign_matr.transpose()).matr))
-    print()
-    return Q * eign_matr, L
+    # print()
+
+    # print("back ", Q * perm.transpose()*(perm * D * perm.transpose() + b*u*u.transpose()) * (Q*perm.transpose()).transpose())
+    # print("back with eign ", Q * (eign_matr * perm) * (perm.transpose() * L * perm) * (Q * (eign_matr * perm)).transpose() )
+    # print("L ",L)
+    # print("QLQt ", (eign_matr * L * eign_matr.transpose()))
+    # if m.matr.shape[0] == m.matr.shape[1] == 2:
+    #     return Q * eign_matr, L
+    return Q * perm.transpose() * eign_matr, L
 
 
 t = np.array([
@@ -209,9 +374,16 @@ t = np.array([
     [0, 0, 6, 100]
 ], np.float)
 
+x = np.array([[-34. , 43. ,  0. ,  0.  , 0. ,  0.],
+ [ 43. , -4., -50. ,  0. ,  0. ,  0.],
+ [  0., -50. , 20.  , 6.,   0.,   0.],
+ [  0.  , 0. ,  6. ,-18.,  12. ,  0.],
+ [  0. ,  0.  , 0. , 12.  ,-2.,  26.],
+ [  0. ,  0. ,  0.  , 0.  ,26. , 38.]], np.float)
+
 
 def own():
-    tm = Matrix(t)
+    tm = Matrix(x)
     Q, D = spectral(tm)
 
     print(tm)
@@ -226,13 +398,38 @@ def own():
 
 
 def generated():
-    m = Matrix.generate(3)
+    m = Matrix.generate(6)
+    print(np.linalg.eig(m.matr)[0])
     Q, D = spectral(m)
     print(D)
     print(np.linalg.eig(m.matr)[0])
     print(Q * D * Q.transpose())
     print(m)
 
+    diag = [D.matr[i, i] for i in range(D.matr.shape[0])]
+    print(diag)
+    print(np.linalg.eig(m.matr)[0])
+
+
 sys.setrecursionlimit(10000)
 generated()
 # own()
+
+x = [1, 20, 30, 10]
+m = Matrix.diag_from_vector(x)
+
+# perm = m.sort()
+# d = perm * m * perm.transpose()
+# l = perm.transpose() * d * perm
+# print(d,l)
+# print(d * perm)
+
+# t = np.array([
+#     [500, 200, 0, 0],
+#     [200, 400, 3, 0],
+#     [0, 3, 1000, 6],
+#     [0, 0, 6, 100]
+# ], np.float)
+# tm = Matrix(t)
+# perm = tm.sort()
+# print(tm * perm)

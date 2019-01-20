@@ -15,13 +15,43 @@ class Matrix:
         for i in range(n):
             # matrix[i, i] = random.randint(6, 10)
 
-            matrix[i, i] = random.randrange(100, 1000,5)
+            matrix[i, i] = random.randrange(-50, 50,2)
         for i in range(n - 1):
             # matrix[i, i + 1] = matrix[i + 1, i] = random.randint(1, 5)
 
-            matrix[i, i + 1] = matrix[i + 1, i] = random.randrange(1,50,4)
+            matrix[i, i + 1] = matrix[i + 1, i] = random.randrange(-50,50,1)
         return Matrix(matrix)
 
+    @staticmethod
+    def generate_sorted(n):
+        # seq = [i for i in range(1, 1000, 5)]
+        matrix = np.zeros((n, n), np.double)
+
+        lst = []
+        for i in range(n):
+            # matrix[i, i] = random.randint(6, 10)
+
+            lst.append(random.randrange(50,100,1))
+
+        # lst.sort(reverse=True)
+
+        for i in range(n):
+            # matrix[i, i] = random.randint(6, 10)
+            matrix[i, i] = lst[i]
+
+        lst = []
+        for i in range(n):
+            # matrix[i, i] = random.randint(6, 10)
+
+            lst.append(random.randrange(1, 5, 1))
+
+        lst.sort(reverse=True)
+
+        for i in range(n - 1):
+            # matrix[i, i + 1] = matrix[i + 1, i] = random.randint(1, 5)
+            matrix[i, i + 1] = matrix[i + 1, i] = lst[i]
+            # matrix[i, i + 1] = matrix[i + 1, i] = random.randrange(1,50,4)
+        return Matrix(matrix)
 
     @staticmethod
     def is_numeric(var):
@@ -79,14 +109,20 @@ class Matrix:
         matr[pos:, pos:] = m2.matr
         return Matrix(matr)
 
+
     def cut(self):
         if self.matr.shape[1] != self.matr.shape[0]:
             raise Exception("sorting supported only in square matrices")
 
+        # if self.matr.shape[0] >= 3:
+        #     position = self.matr.shape[0] - 3
+        # else:
+        #     position = self.matr.shape[0] - 2
+        #
         if self.matr.shape[0] >= 3:
-            position = self.matr.shape[0] - 3
+            position = 1
         else:
-            position = self.matr.shape[0] - 2
+            position = 0
         # print(position)
 
         matr = self.matr.copy()
