@@ -4,17 +4,80 @@ import numpy as np
 from numpy.linalg import inv
 import functools
 import random
+import scipy.linalg as sp
 
 
 class Matrix:
 
+
+    def change(self,eps):
+        matrix = self.matr
+        n = self.matr.shape[0]
+        for i in range(n - 1):
+            matrix[i, i + 1] = matrix[i + 1, i] = matrix[i + 1, i] + eps
+
+        for i in range(n-1):
+            matrix[i, i] = matrix[i, i] + eps
+
+    @staticmethod
+    def generate_wilk(n):
+        if (n - 1)%2 != 0:
+            raise RuntimeError("need 2n+1 format")
+        matrix = np.zeros((n, n), np.double)
+        for i in range(n - 1):
+            matrix[i, i + 1] = matrix[i + 1, i] = 1
+        start = (n-1)/2
+        for i in range((n-1)//2):
+            matrix[i, i] = start-i
+            matrix[n - 1 - i, n - 1 - i] = start-i
+        return Matrix(matrix)
+    @staticmethod
+    def generate_hilbert(n):
+        return Matrix(sp.hilbert(n))
+
     @staticmethod
     def generate(n):
-        matrix = np.zeros((n, n))
+        # seq = [i for i in range(1, 1000, 5)]
+        matrix = np.zeros((n, n), np.double)
         for i in range(n):
-            matrix[i, i] = random.uniform(10, 100)
+            # matrix[i, i] = random.randint(6, 10)
+
+            matrix[i, i] = random.randrange(-50, 50,2)
         for i in range(n - 1):
-            matrix[i, i + 1] = matrix[i + 1, i] = random.uniform(10, 100)
+            # matrix[i, i + 1] = matrix[i + 1, i] = random.randint(1, 5)
+            sign = 1 if random.randint(0,1) == 1 else -1
+            matrix[i, i + 1] = matrix[i + 1, i] = random.randrange(1,50,1)*sign
+        return Matrix(matrix)
+
+    @staticmethod
+    def generate_sorted(n):
+        # seq = [i for i in range(1, 1000, 5)]
+        matrix = np.zeros((n, n), np.double)
+
+        lst = []
+        for i in range(n):
+            # matrix[i, i] = random.randint(6, 10)
+
+            lst.append(random.randrange(50,100,1))
+
+        # lst.sort(reverse=True)
+
+        for i in range(n):
+            # matrix[i, i] = random.randint(6, 10)
+            matrix[i, i] = lst[i]
+
+        lst = []
+        for i in range(n):
+            # matrix[i, i] = random.randint(6, 10)
+
+            lst.append(random.randrange(1, 5, 1))
+
+        lst.sort(reverse=True)
+
+        for i in range(n - 1):
+            # matrix[i, i + 1] = matrix[i + 1, i] = random.randint(1, 5)
+            matrix[i, i + 1] = matrix[i + 1, i] = lst[i]
+            # matrix[i, i + 1] = matrix[i + 1, i] = random.randrange(1,50,4)
         return Matrix(matrix)
 
     @staticmethod
@@ -31,7 +94,7 @@ class Matrix:
 
     @staticmethod
     def zeros(n):
-        return Matrix(np.zeros((n, n), np.float))
+        return Matrix(np.zeros((n, n), np.double))
 
     @staticmethod
     def diag_from_vector(diag):
@@ -52,7 +115,7 @@ class Matrix:
 
     @staticmethod
     def vector(vec):
-        m = np.zeros((len(vec), 1), np.float)
+        m = np.zeros((len(vec), 1), np.double)
         for i in range(len(vec)):
             m[i, 0] = vec[i]
         return Matrix(m)
@@ -68,26 +131,34 @@ class Matrix:
     def diagonaled(m1, m2):
         pos = m1.matr.shape[0]
         length = m1.matr.shape[0] + m2.matr.shape[0]
-        matr = np.zeros((length, length))
+        matr = np.zeros((length, length),np.double)
         matr[:pos, :pos] = m1.matr
         matr[pos:, pos:] = m2.matr
         return Matrix(matr)
+
 
     def cut(self):
         if self.matr.shape[1] != self.matr.shape[0]:
             raise Exception("sorting supported only in square matrices")
 
-        if self.matr.shape[0] >= 3:
-            position = self.matr.shape[0] - 3
-        else:
-            position = self.matr.shape[0] - 2
+        # if self.matr.shape[0] >= 3:
+        #     position = self.matr.shape[0] - 3
+        # else:
+        #     position = self.matr.shape[0] - 2
+        #
+        # if self.matr.shape[0] >= 3:
+        #     position = 1
+        # else:
+        #     position = 0
+
+        position = self.matr.shape[0]//2-1
         # print(position)
 
         matr = self.matr.copy()
 
         b = matr[position, position + 1]
 
-        v = np.zeros((matr.shape[0], 1))
+        v = np.zeros((matr.shape[0], 1),np.double)
         v[position, 0] = 1
         v[position + 1, 0] = 1
 
@@ -99,7 +170,7 @@ class Matrix:
         t1 = Matrix(matr[:position + 1, :position + 1])
         t2 = Matrix(matr[position + 1:, position + 1:])
 
-        return self.diagonaled(t1, t2), t1, t2, b, Matrix(v)
+        return t1, t2, b, Matrix(v)
 
         # print(self.matr[:position+1,:position+1])
 
@@ -109,20 +180,17 @@ class Matrix:
 
         matr = self.matr.copy()
         permutation = self.identity(self.matr.shape[0])
-
-        left = self.identity(self.matr.shape[0])
-        right = self.identity(self.matr.shape[0])
         length = self.matr.shape[0]
 
         for i in range(length - 1, 0, -1):
             for j in range(i):
                 if matr[j, j] < matr[j + 1, j + 1]:
                     permutation = self.swap_rows_matr(j, j + 1) * permutation
-                    left = self.swap_rows_matr(j, j + 1) * left
-                    right = right * self.swap_cols_matr(j, j + 1)
+                    # left = self.swap_rows_matr(j, j + 1) * left
+                    # right = right * self.swap_cols_matr(j, j + 1)
                     matr[j, j], matr[j + 1, j + 1] = matr[j + 1, j + 1], matr[j, j]
 
-        return permutation, left, right
+        return permutation
 
     def swap_cols_matr(self, i, j):
         id = self.identity(self.matr.shape[1]).matr
@@ -179,4 +247,4 @@ class Matrix:
             raise Exception("unsupported type for operation : {}".format(type(other)))
 
     def __str__(self):
-        return str(self.matr)
+        return np.array_str(self.matr,precision=8,suppress_small=True)
