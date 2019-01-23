@@ -4,9 +4,36 @@ import numpy as np
 from numpy.linalg import inv
 import functools
 import random
+import scipy.linalg as sp
 
 
 class Matrix:
+
+
+    def change(self,eps):
+        matrix = self.matr
+        n = self.matr.shape[0]
+        for i in range(n - 1):
+            matrix[i, i + 1] = matrix[i + 1, i] = matrix[i + 1, i] + eps
+
+        for i in range(n-1):
+            matrix[i, i] = matrix[i, i] + eps
+
+    @staticmethod
+    def generate_wilk(n):
+        if (n - 1)%2 != 0:
+            raise RuntimeError("need 2n+1 format")
+        matrix = np.zeros((n, n), np.double)
+        for i in range(n - 1):
+            matrix[i, i + 1] = matrix[i + 1, i] = 1
+        start = (n-1)/2
+        for i in range((n-1)//2):
+            matrix[i, i] = start-i
+            matrix[n - 1 - i, n - 1 - i] = start-i
+        return Matrix(matrix)
+    @staticmethod
+    def generate_hilbert(n):
+        return Matrix(sp.hilbert(n))
 
     @staticmethod
     def generate(n):
@@ -18,8 +45,8 @@ class Matrix:
             matrix[i, i] = random.randrange(-50, 50,2)
         for i in range(n - 1):
             # matrix[i, i + 1] = matrix[i + 1, i] = random.randint(1, 5)
-
-            matrix[i, i + 1] = matrix[i + 1, i] = random.randrange(-50,50,1)
+            sign = 1 if random.randint(0,1) == 1 else -1
+            matrix[i, i + 1] = matrix[i + 1, i] = random.randrange(1,50,1)*sign
         return Matrix(matrix)
 
     @staticmethod
@@ -119,10 +146,12 @@ class Matrix:
         # else:
         #     position = self.matr.shape[0] - 2
         #
-        if self.matr.shape[0] >= 3:
-            position = 1
-        else:
-            position = 0
+        # if self.matr.shape[0] >= 3:
+        #     position = 1
+        # else:
+        #     position = 0
+
+        position = self.matr.shape[0]//2-1
         # print(position)
 
         matr = self.matr.copy()
