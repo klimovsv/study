@@ -31,22 +31,22 @@ class Matrix:
             matrix[i, i] = start-i
             matrix[n - 1 - i, n - 1 - i] = start-i
         return Matrix(matrix)
+
     @staticmethod
     def generate_hilbert(n):
         return Matrix(sp.hilbert(n))
 
     @staticmethod
     def generate(n):
-        # seq = [i for i in range(1, 1000, 5)]
+
         matrix = np.zeros((n, n), np.double)
         for i in range(n):
-            # matrix[i, i] = random.randint(6, 10)
+            matrix[i, i] = random.randrange(-50, 50,1)
 
-            matrix[i, i] = random.randrange(-50, 50,2)
         for i in range(n - 1):
-            # matrix[i, i + 1] = matrix[i + 1, i] = random.randint(1, 5)
             sign = 1 if random.randint(0,1) == 1 else -1
             matrix[i, i + 1] = matrix[i + 1, i] = random.randrange(1,50,1)*sign
+
         return Matrix(matrix)
 
     @staticmethod
