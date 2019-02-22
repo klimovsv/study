@@ -18,11 +18,13 @@ Z = (X-1)**2 + 2*Y**2
 # Plot the surface.
 # surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
 #                        linewidth=0, antialiased=False)
-# cset = ax.contour(X, Y, Z,[1,4,9,16], cmap=cm.coolwarm)
+cset = ax.contour(X, Y, Z,[1,4,9,16], cmap=cm.coolwarm)
 
 
 # Customize the z axis.
-ax.set_zlim(-10, 10)
+# ax.set_zlim(-10, 10)
+
+ax.set_zscale('log')
 ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 
