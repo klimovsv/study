@@ -1,1 +1,1 @@
-scalac -classpath G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes -bootclasspath G:\Users\archy_gf3usj8\.sbt\boot\scala-2.12.4\lib\scala-library.jar G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\src\main\scala\lab4.scala
+scalac -classpath /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes -bootclasspath /home/archy/.sbt/boot/scala-2.12.4/lib/scala-library.jar /home/archy/JetBrains/ideaProj/ScalaLabs/src/main/scala/Lab3/Main.scala

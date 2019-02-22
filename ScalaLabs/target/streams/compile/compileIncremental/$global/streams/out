@@ -1,42 +1,33 @@
-[debug] 
-[debug] Initial source changes: 
-[debug] 	removed:Set()
-[debug] 	added: Set()
-[debug] 	modified: Set(G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\src\main\scala\lab4.scala)
-[debug] Invalidated products: Set()
-[debug] External API changes: API Changes: Set()
-[debug] Modified binary dependencies: Set()
-[debug] Initial directly invalidated classes: Set(Main.Handler.numPush, Main.Handler, SuperStack, Main, Main.Handler.push, Main.MinMax, Main.MinMax.MinMaxStack)
-[debug] 
-[debug] Sources indirectly invalidated by:
-[debug] 	product: Set()
-[debug] 	binary dep: Set()
-[debug] 	external source: Set()
-[debug] All initially invalidated classes: Set(Main.Handler.numPush, Main.Handler, SuperStack, Main, Main.Handler.push, Main.MinMax, Main.MinMax.MinMaxStack)
-[debug] All initially invalidated sources:Set(G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\src\main\scala\lab4.scala)
-[info] Compiling 1 Scala source to G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes ...
-[debug] Getting org.scala-sbt:compiler-bridge_2.12:1.1.1:compile for Scala 2.12.4
-[debug] Getting org.scala-sbt:compiler-bridge_2.12:1.1.1:compile for Scala 2.12.4
-[debug] [zinc] Running cached compiler 3ac87633 for Scala compiler version 2.12.4
-[debug] [zinc] The Scala compiler is invoked with:
-[debug] 	-bootclasspath
-[debug] 	G:\Users\archy_gf3usj8\.sbt\boot\scala-2.12.4\lib\scala-library.jar
-[debug] 	-classpath
-[debug] 	G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes
-[debug] Scala compilation took 2.383632657 s
-[info] Done compiling.
-[debug] Invalidating (transitively) by inheritance from SuperStack...
-[debug] Initial set of included nodes: Set(SuperStack)
-[debug] Invalidated by transitive inheritance dependency: Set(SuperStack)
-[debug] Change NamesChange(SuperStack,ModifiedNames(changes = UsedName(SuperStack;init;,[Default]))) invalidates 1 classes due to The SuperStack has the following regular definitions changed:
-[debug] 	UsedName(SuperStack;init;,[Default]).
-[debug] 	> by transitive inheritance: Set(SuperStack)
-[debug] 	> 
-[debug] 	> 
-[debug]         
-[debug] New invalidations:
-[debug] 	Set()
-[debug] Initial set of included nodes: Set()
-[debug] Previously invalidated, but (transitively) depend on new invalidations:
-[debug] 	Set()
-[debug] All newly invalidated classes after taking into account (previously) recompiled classes:Set()
+[0m[[0m[0mdebug[0m] [0m[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial source changes: [0m
+[0m[[0m[0mdebug[0m] [0m[0m	removed:Set(/home/archy/JetBrains/ideaProj/ScalaLabs/src/main/scala/Lab4/Lab4A.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	added: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	modified: Set(/home/archy/JetBrains/ideaProj/ScalaLabs/src/main/scala/Lab3/Main.scala)[0m
+[0m[[0m[0mdebug[0m] [0m[0mInvalidated products: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mExternal API changes: API Changes: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mModified binary dependencies: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial directly invalidated classes: Set(Lab3.Main)[0m
+[0m[[0m[0mdebug[0m] [0m[0m[0m
+[0m[[0m[0mdebug[0m] [0m[0mSources indirectly invalidated by:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	product: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	binary dep: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0m	external source: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated classes: Set(Lab3.Main)[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll initially invalidated sources:Set(/home/archy/JetBrains/ideaProj/ScalaLabs/src/main/scala/Lab3/Main.scala)[0m
+[0m[[0m[0minfo[0m] [0m[0mCompiling 1 Scala source to /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mGetting org.scala-sbt:compiler-bridge_2.12:1.1.1:compile for Scala 2.12.4[0m
+[0m[[0m[0mdebug[0m] [0m[0mGetting org.scala-sbt:compiler-bridge_2.12:1.1.1:compile for Scala 2.12.4[0m
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] Running cached compiler 761442df for Scala compiler version 2.12.4[0m
+[0m[[0m[0mdebug[0m] [0m[0m[zinc] The Scala compiler is invoked with:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-bootclasspath[0m
+[0m[[0m[0mdebug[0m] [0m[0m	/home/archy/.sbt/boot/scala-2.12.4/lib/scala-library.jar[0m
+[0m[[0m[0mdebug[0m] [0m[0m	-classpath[0m
+[0m[[0m[0mdebug[0m] [0m[0m	/home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes[0m
+[0m[[0m[0mdebug[0m] [0m[0mScala compilation took 1.377239521 s[0m
+[0m[[0m[0minfo[0m] [0m[0mDone compiling.[0m
+[0m[[0m[0mdebug[0m] [0m[0mNew invalidations:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mInitial set of included nodes: Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mPreviously invalidated, but (transitively) depend on new invalidations:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Set()[0m
+[0m[[0m[0mdebug[0m] [0m[0mAll newly invalidated classes after taking into account (previously) recompiled classes:Set()[0m

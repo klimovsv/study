@@ -4,7 +4,7 @@
 		module="scalalabs$sources"
 		revision="0.1"
 		status="integration"
-		publication="20180330231249"
+		publication="20180409193108"
 	/>
 	<configurations>
 		<conf name="compile" visibility="public" description=""/>

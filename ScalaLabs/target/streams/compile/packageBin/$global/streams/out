@@ -1,23 +1,41 @@
-[info] Packaging G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\scalalabs_2.12-0.1.jar ...
-[debug] Input file mappings:
-[debug] 	Main$Handler$.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$Handler$.class
-[debug] 	SuperStack.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\SuperStack.class
-[debug] 	Main$MinMax$MinMaxStack.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$MinMax$MinMaxStack.class
-[debug] 	Main$Handler$numPush.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$Handler$numPush.class
-[debug] 	Main.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main.class
-[debug] 	Main$Handler.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$Handler.class
-[debug] 	Num.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Num.class
-[debug] 	Main$MinMax$.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$MinMax$.class
-[debug] 	Main$.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$.class
-[debug] 	Main$Handler$push.class
-[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$Handler$push.class
-[info] Done packaging.
+[0m[[0m[0minfo[0m] [0m[0mPackaging /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/scalalabs_2.12-0.1.jar ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mInput file mappings:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/DomainTags.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/DomainTags.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Scanner.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Scanner.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Pos.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Pos.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Main$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Main$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	lab2/Main$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/lab2/Main$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Whitespaces.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Whitespaces.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Main.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Main.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	lab2/Point.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/lab2/Point.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Token.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Token.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/SyntaxErr.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/SyntaxErr.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	lab2/Main.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/lab2/Main.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Comments.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Comments.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3[0m
+[0m[[0m[0mdebug[0m] [0m[0m	lab2/Set.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/lab2/Set.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/DomainTags$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/DomainTags$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	lab2[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/lab2[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Main$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Main$$anon$1.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Numbers.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Numbers.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	Lab3/Identifiers.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /home/archy/JetBrains/ideaProj/ScalaLabs/target/scala-2.12/classes/Lab3/Identifiers.class[0m
+[0m[[0m[0minfo[0m] [0m[0mDone packaging.[0m
