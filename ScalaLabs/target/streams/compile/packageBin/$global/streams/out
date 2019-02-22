@@ -1,0 +1,23 @@
+[info] Packaging G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\scalalabs_2.12-0.1.jar ...
+[debug] Input file mappings:
+[debug] 	Main$Handler$.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$Handler$.class
+[debug] 	SuperStack.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\SuperStack.class
+[debug] 	Main$MinMax$MinMaxStack.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$MinMax$MinMaxStack.class
+[debug] 	Main$Handler$numPush.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$Handler$numPush.class
+[debug] 	Main.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main.class
+[debug] 	Main$Handler.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$Handler.class
+[debug] 	Num.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Num.class
+[debug] 	Main$MinMax$.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$MinMax$.class
+[debug] 	Main$.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$.class
+[debug] 	Main$Handler$push.class
+[debug] 	  G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes\Main$Handler$push.class
+[info] Done packaging.

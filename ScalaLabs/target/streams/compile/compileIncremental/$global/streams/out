@@ -1,0 +1,42 @@
+[debug] 
+[debug] Initial source changes: 
+[debug] 	removed:Set()
+[debug] 	added: Set()
+[debug] 	modified: Set(G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\src\main\scala\lab4.scala)
+[debug] Invalidated products: Set()
+[debug] External API changes: API Changes: Set()
+[debug] Modified binary dependencies: Set()
+[debug] Initial directly invalidated classes: Set(Main.Handler.numPush, Main.Handler, SuperStack, Main, Main.Handler.push, Main.MinMax, Main.MinMax.MinMaxStack)
+[debug] 
+[debug] Sources indirectly invalidated by:
+[debug] 	product: Set()
+[debug] 	binary dep: Set()
+[debug] 	external source: Set()
+[debug] All initially invalidated classes: Set(Main.Handler.numPush, Main.Handler, SuperStack, Main, Main.Handler.push, Main.MinMax, Main.MinMax.MinMaxStack)
+[debug] All initially invalidated sources:Set(G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\src\main\scala\lab4.scala)
+[info] Compiling 1 Scala source to G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes ...
+[debug] Getting org.scala-sbt:compiler-bridge_2.12:1.1.1:compile for Scala 2.12.4
+[debug] Getting org.scala-sbt:compiler-bridge_2.12:1.1.1:compile for Scala 2.12.4
+[debug] [zinc] Running cached compiler 3ac87633 for Scala compiler version 2.12.4
+[debug] [zinc] The Scala compiler is invoked with:
+[debug] 	-bootclasspath
+[debug] 	G:\Users\archy_gf3usj8\.sbt\boot\scala-2.12.4\lib\scala-library.jar
+[debug] 	-classpath
+[debug] 	G:\Users\archy_gf3usj8\IdeaProjects\ScalaLabs\target\scala-2.12\classes
+[debug] Scala compilation took 2.383632657 s
+[info] Done compiling.
+[debug] Invalidating (transitively) by inheritance from SuperStack...
+[debug] Initial set of included nodes: Set(SuperStack)
+[debug] Invalidated by transitive inheritance dependency: Set(SuperStack)
+[debug] Change NamesChange(SuperStack,ModifiedNames(changes = UsedName(SuperStack;init;,[Default]))) invalidates 1 classes due to The SuperStack has the following regular definitions changed:
+[debug] 	UsedName(SuperStack;init;,[Default]).
+[debug] 	> by transitive inheritance: Set(SuperStack)
+[debug] 	> 
+[debug] 	> 
+[debug]         
+[debug] New invalidations:
+[debug] 	Set()
+[debug] Initial set of included nodes: Set()
+[debug] Previously invalidated, but (transitively) depend on new invalidations:
+[debug] 	Set()
+[debug] All newly invalidated classes after taking into account (previously) recompiled classes:Set()
