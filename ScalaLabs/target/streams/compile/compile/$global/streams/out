@@ -1,0 +1,16 @@
+[0m[[0m[31merror[0m] [0m[0m/home/archy/JetBrains/ideaProj/ScalaLabs/src/main/scala/Lab4/lab4.scala:67:76: not found: type Handler[0m
+[0m[[0m[31merror[0m] [0m[0mclass SuperStack[T] (val len: Int, val lst : List[(T, T, T)])(implicit h : Handler[T]){[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                           ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/archy/JetBrains/ideaProj/ScalaLabs/src/main/scala/Lab4/lab4.scala:63:3: value update is not a member of Lab4.Facade[T][0m
+[0m[[0m[31merror[0m] [0m[0m  this() = new SuperStack[T,Handler[T]]()[0m
+[0m[[0m[31merror[0m] [0m[0m  ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/archy/JetBrains/ideaProj/ScalaLabs/src/main/scala/Lab4/lab4.scala:63:16: wrong number of type arguments for Lab4.SuperStack, should be 1[0m
+[0m[[0m[31merror[0m] [0m[0m  this() = new SuperStack[T,Handler[T]]()[0m
+[0m[[0m[31merror[0m] [0m[0m               ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/archy/JetBrains/ideaProj/ScalaLabs/src/main/scala/Lab4/lab4.scala:83:57: not found: type Handler[0m
+[0m[[0m[31merror[0m] [0m[0m  implicit class HandlerExtenstion[T: Numeric](handler: Handler[T]) {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                        ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/archy/JetBrains/ideaProj/ScalaLabs/src/main/scala/Lab4/lab4.scala:88:50: wrong number of type arguments for Lab4.SuperStack, should be 1[0m
+[0m[[0m[31merror[0m] [0m[0m  implicit class SuperStack2[T : Numeric](stack: SuperStack[T, OptimizedHandler[T]]) {[0m
+[0m[[0m[31merror[0m] [0m[0m                                                 ^[0m
+[0m[[0m[31merror[0m] [0m[0m5 errors found[0m

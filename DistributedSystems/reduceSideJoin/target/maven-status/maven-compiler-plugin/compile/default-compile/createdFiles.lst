@@ -1,0 +1,10 @@
+ru/sergey/join/App.class
+ru/sergey/join/IdPartitioner.class
+ru/sergey/join/AirportNameMapper.class
+ru/sergey/join/CompositeKey.class
+ru/sergey/join/GroupingIdComparatorClass.class
+ru/sergey/spark/test/FlightInfo.class
+ru/sergey/join/JoinReducer.class
+ru/sergey/spark/test/App.class
+ru/sergey/join/DelayMapper.class
+ru/sergey/spark/test/Utils.class
