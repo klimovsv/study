@@ -1,10 +1,6 @@
 import math
 
 
-def nf(x):
-    return 100 * (x ** 2 - 2) ** 3 + (x - 1) ** 2 - math.fabs(10 + x)
-
-
 def function(x):
     return 5 * x ** 6 - 36 * x ** 5 - 165 * x ** 4 / 2 - 60 * x ** 3 + 36
 
@@ -159,7 +155,7 @@ def main():
     bis = bisection(interval, function, eps)
     gol = golden(interval, function, eps)
     fibbon = fib_method(interval, function, eps)
-    print(x0,interval)
+    print(x0, interval)
     print(math.fabs(bis[0] - target), "bisection", bis[1], bis[0], function(bis[0]))
     print(math.fabs(gol[0] - target), "gold", gol[1], gol[0], function(gol[0]))
     print(math.fabs(fibbon[0] - target), "fib", fibbon[1], fibbon[0], function(fibbon[0]))

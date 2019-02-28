@@ -158,7 +158,7 @@ class Matrix:
 
         b = matr[position, position + 1]
 
-        v = np.zeros((matr.shape[0], 1),np.double)
+        v = np.zeros((matr.shape[0], 1), np.double)
         v[position, 0] = 1
         v[position + 1, 0] = 1
 
