@@ -12,9 +12,10 @@ def function(x):
 def qubic_interpolation(s0, step, eps, delta, f, f_der):
     y_der_0 = f_der(s0)
     k = 0
-    dir = -1 if y_der_0 > 0 else 1
+    direction = -1 if y_der_0 > 0 else 1
+
     while True:
-        s_n = s0 + dir * 2 ** k * step
+        s_n = s0 + direction * 2 ** k * step
 
         if f_der(s_n) * f_der(s0) <= 0:
             break
@@ -59,9 +60,6 @@ def quadric_interpolation(s1, step, eps, delta, f):
         return left, p, right
 
     s2 = s1 + step
-
-    f1 = f(s1)
-    f2 = f(s2)
 
     if f(s1) > f(s2):
         s3 = s1 + 2 * step
