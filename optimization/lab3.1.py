@@ -146,7 +146,7 @@ def fib_method(interval, f, eps, k=0):
 
 
 def main():
-    step = 0.001
+    step = 0.0001
     eps = 0.00001
     x0 = -13
     target = 7.56001

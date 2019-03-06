@@ -1,5 +1,5 @@
 from sympy import *
-
+import math
 
 def derivative(x):
     return 30 * x ** 5 - 36 * 5 * x ** 4 - 165 * 2 * x ** 3 - 180 * x ** 2
@@ -12,6 +12,7 @@ def function(x):
 def qubic_interpolation(s0, step, eps, delta, f, f_der):
     y_der_0 = f_der(s0)
     k = 0
+    n = 0
     direction = -1 if y_der_0 > 0 else 1
 
     while True:
@@ -27,7 +28,7 @@ def qubic_interpolation(s0, step, eps, delta, f, f_der):
     s2 = s_n
 
     while True:
-        print(s1, s2)
+        # print(s1, s2)
         f1 = f(s1)
         fd1 = f_der(s1)
         f2 = f(s2)
@@ -47,13 +48,15 @@ def qubic_interpolation(s0, step, eps, delta, f, f_der):
                     break
 
         if math.fabs(f_der(sapr)) <= eps and math.fabs((sapr - s1) / sapr) <= delta:
-            return sapr
+            n += 1
+            return sapr, n
 
         s2 = s1 if f_der(sapr) * f_der(s1) < 0 else s2
         s1 = sapr
+        n += 1
 
 
-def quadric_interpolation(s1, step, eps, delta, f):
+def quadric_interpolation(s1, step, eps, delta, f , n = 0):
     def get_left_right(p, arr):
         left = max(filter(lambda a: p >= a, arr))
         right = min(filter(lambda a: p <= a, arr))
@@ -78,32 +81,37 @@ def quadric_interpolation(s1, step, eps, delta, f):
             aprs = ((s2 ** 2 - s3 ** 2) * f1 + (s3 ** 2 - s1 ** 2) * f2 + (s1 ** 2 - s2 ** 2) * f3) \
                    / (2 * ((s2 - s3) * f1 + (s3 - s1) * f2 + (s1 - s2) * f3))
         except ZeroDivisionError:
-            return quadric_interpolation(mins, step, eps, delta, f)
+            return quadric_interpolation(mins, step, eps, delta, f, n+1)
 
         fapr = f(aprs)
         clause1 = math.fabs((minf - fapr) / fapr) < eps
         clause2 = math.fabs((mins - aprs) / aprs) < delta
-        print(1, math.fabs((minf - fapr) / fapr))
-        print(2, math.fabs((mins - aprs) / aprs))
+        # print(1, math.fabs((minf - fapr) / fapr))
+        # print(2, math.fabs((mins - aprs) / aprs))
 
+        n += 1
         if clause1 and clause2:
-            return aprs
+            return aprs, n
         if s1 <= aprs <= s3:
             if fapr < minf:
                 s1, s2, s3 = get_left_right(aprs, [s1, s2, s3, mins])
             else:
                 s1, s2, s3 = get_left_right(mins, [s1, s2, s3, aprs])
         else:
-            return quadric_interpolation(aprs, step, eps, delta, f)
+            return quadric_interpolation(aprs, step, eps, delta, f, n)
 
 
 def main():
-    step = 0.00001
-    eps = 0.000001
+    step = 0.0001
+    eps = 0.00001
     x0 = 10
     target = 7.56001
-    print(quadric_interpolation(x0, step, eps, eps, function))
-    print(qubic_interpolation(x0, step, eps, eps, function, derivative))
+    quad, n = quadric_interpolation(x0, step, eps, eps, function)
+    qub, n_q = qubic_interpolation(x0, step, eps, eps, function, derivative)
+    # print(quadric_interpolation(x0, step, eps, eps, function))
+    # print(qubic_interpolation(x0, step, eps, eps, function, derivative))
+    print("quad", math.fabs(quad-target), function(quad), n,qub)
+    print("qub", math.fabs(qub - target), function(qub), n_q,qub)
 
 
 if __name__ == "__main__":
