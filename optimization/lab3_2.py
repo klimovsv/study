@@ -1,4 +1,3 @@
-from sympy import *
 import math
 
 def derivative(x):
@@ -104,7 +103,7 @@ def quadric_interpolation(s1, step, eps, delta, f , n = 0):
 def main():
     step = 0.0001
     eps = 0.00001
-    x0 = 10
+    x0 = 27
     target = 7.56001
     quad, n = quadric_interpolation(x0, step, eps, eps, function)
     qub, n_q = qubic_interpolation(x0, step, eps, eps, function, derivative)
