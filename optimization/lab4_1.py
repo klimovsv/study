@@ -1,10 +1,10 @@
 import copy
-import scipy
+import scipy.optimize
 import numpy
 import math
 import lab3_1
 import operator
-
+from goto import with_goto
 
 def rosenbrock(a, b, f0):
     def f(x):
@@ -69,8 +69,8 @@ def condition(simplex, l_ind, eps , f):
         res += (f(simplex[i]) - f(simplex[l_ind]))**2
     return math.sqrt(res/(len(simplex)+1)) <= eps
 
-
-def nelder_mead(f, x0, alpha=1, beta=0.5, gamma=2, mu=0.5, phi=0.01, eps=0.001):
+@with_goto
+def nelder_mead(f, x0, alpha=1, beta=0.5, gamma=2, mu=0.0001, phi=0.01, eps=0.0001):
     n = len(x0)
     simplex = [x0]
     k = 0
@@ -82,57 +82,58 @@ def nelder_mead(f, x0, alpha=1, beta=0.5, gamma=2, mu=0.5, phi=0.01, eps=0.001):
     for i in range(n):
         li_arr = [l2 for i in range(n)]
         li_arr[i] = l1
-        simplex.append(x0 + li_arr)
+        simplex.append(x0 + numpy.array(li_arr))
 
-    fi = []
-    for x in simplex:
-        fi.append(f(x))
-
-    while True:
-        k += 1
-        zipped = list(zip(simplex, fi, range(n + 1)))
-        xh_z = max(zipped, key=operator.itemgetter(1))
-        xl_z = min(zipped, key=operator.itemgetter(1))
-        cent = mass_cent(simplex, xh_z[2])
-        h_ind = xh_z[2]
-        l_ind = xl_z[2]
-
-        xr = (1 + alpha) * cent - alpha * simplex[h_ind]
-        fr = f(xr)
-
-        if fr < f(simplex[l_ind]):
-            xe = (1 - gamma) * cent + gamma * xr
-            fe = f(xe)
-            if fe < fr:
-                simplex[h_ind] = xe
-            elif fr < fe:
-                simplex[h_ind] = xr
-            if condition(simplex, l_ind, eps, f):
-                return simplex[l_ind]
-            else:
-                continue
-
-        elif f(simplex[l_ind]) < fr < f(simplex[h_ind]):
-            simplex[h_ind], xr = xr, simplex[h_ind]
-            fr = f(xr)
-        xs = beta * simplex[h_ind] + (1 - beta) * cent
-        fs = f(xs)
-        if fs < f(simplex[h_ind]):
-            simplex[h_ind] = xs
-            if condition(simplex, l_ind, eps, f):
-                return simplex[l_ind]
-            else:
-                continue
-        elif fs > f(simplex[h_ind]):
-            for i, x in enumerate(simplex):
-                if i != l_ind:
-                    simplex[i] = simplex[l_ind] + (x - simplex[l_ind]) * mu
-
-        if condition(simplex, l_ind, eps, f):
-            return simplex[l_ind]
+    label .step1
+    print("step1")
+    simplex.sort(key=lambda v: f(v))
 
 
-def hooke_jeeves(f, x0, eps, delta, l, beta, n=4):
+
+    label .step2
+    print("step2")
+    x_cent = (sum(simplex) - simplex[-1])/n
+
+    label .step3
+    print("step3")
+    xr = x_cent + alpha*(x_cent - simplex[-1])
+    if f(xr) <= f(simplex[-2]):
+        simplex[-1] = xr
+        goto .step1
+
+    label .step31
+
+    print("step31")
+    if f(xr) <= f(simplex[0]):
+        xe = x_cent + gamma*(x_cent - simplex[-1])
+        if f(xe) <= f(xr):
+            simplex[-1] = xe
+            goto .step1
+        else:
+            simplex[-1] = xr
+    else:
+        goto .step5
+
+    label .step4
+    print("step4")
+    x_cont = x_cent + beta * (x_cent - simplex[-1])
+    if f(x_cont) <= f(simplex[-1]):
+        simplex[-1] =x_cont
+        goto .step1
+
+    label .step5
+
+    for i in range(1,len(simplex)):
+        simplex[i] = simplex[0] + mu * (simplex[i] - simplex[0])
+
+    print("step5")
+    if sum(map(lambda x: (f(x) - f(x_cent))**2, simplex))/(n+1) <= eps:
+        return simplex[0]
+
+    goto .step1
+
+
+def hooke_jeeves(f, x0, eps=0.00001, delta=[0.001,0.001,0.001,0.001], l=2, beta=2, n=4):
     while True:
         x_next = find_new(x0, delta, n, f)
 
@@ -148,22 +149,15 @@ def hooke_jeeves(f, x0, eps, delta, l, beta, n=4):
                 return x_next
 
         dir = [l * (x2 - x1) for x2, x1 in zip(x_next, x0)]
-        new_f = to_scipy(f, x0, dir)
 
-        interval = lab3_1.get_start_interval(new_f, 0, 0.001)
-        res = lab3_1.bisection(interval, new_f, eps)[0]
+        new_f = to_scipy(f, x0, dir)
+        res = scipy.optimize.minimize_scalar(new_f, method='Golden').x
 
         x0 = (numpy.array(x0) + res * numpy.array(dir)).tolist()
 
 
 def main():
-    # print(hooke_jeeves(rosenbrock(30, 2, 80),
-    #                    [1.5, 1.5, 1.5, 1.5],
-    #                    0.00001,
-    #                    [0.1, 0.1, 0.1, 0.1],
-    #                    1,
-    #                    2))
-    print(nelder_mead(rosenbrock(30, 2, 80), numpy.array([2, 2])))
+    print(nelder_mead(rosenbrock(30, 2, 80), numpy.array([2, 2, 2, 2])))
 
 
 if __name__ == "__main__":
