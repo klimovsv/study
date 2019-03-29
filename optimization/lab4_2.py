@@ -60,19 +60,16 @@ def grad_descent(f, grad, x0, e1=0.00001, e2=0.00001):
     i = 0
     while True:
         dir = -grad(x[i])
-
         new_f = lambda t: f(x[i] + t * dir)
         alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
         x.append(x[i] + alpha * dir)
-
         if numpy.linalg.norm(grad(x[i])) < e1 and abs(f(x[i + 1]) - f(x[i])) < e2:
             return x[i + 1]
 
         i += 1
 
 
-
-def fletcher_powell(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.000001, max_iters=10000):
+def fletcher_powell(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.000001, max_iters = 100000):
     x = [x0]
     i = 0
     A = [numpy.eye(len(x0))]
@@ -81,11 +78,9 @@ def fletcher_powell(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.000001, max_ite
     new_f = lambda t: f(x[i] + t * dir[i])
     alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
     x.append(x[i] + alpha * dir[i])
-
-    while True:
+    while i < max_iters:
         dx = numpy.array([x[i + 1] - x[i]])
         dg = numpy.array([grad(x[i + 1]) - grad(x[i])])
-
         A.append(A[i] +
                  numpy.matmul(dx.transpose(), dx) / (numpy.matmul(dx, dg.transpose())) -
                  numpy.matmul(numpy.matmul(A[i], dg.transpose()), numpy.matmul(dg, A[i])) / (
@@ -102,8 +97,9 @@ def fletcher_powell(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.000001, max_ite
 
         i += 1
 
+    return x[-1]
 
-def fletcher_reevs(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.00001, max_iters=1000):
+def fletcher_reevs(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.00001, max_iters = 100000):
     x = [x0]
     i = 0
     dir = [-grad(x0)]
@@ -125,7 +121,7 @@ def fletcher_reevs(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.00001, max_iters
         i += 1
 
 
-def levenberg_marquardt(f, grad, hessian, x0, e1=0.00001, e2=0.00001):
+def levenberg_marquardt(f, grad, hessian, x0, e1=0.00001, e2=0.00001, max_iters = 100000):
     x = [x0]
     l = 2
     i = 0
