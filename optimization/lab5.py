@@ -13,15 +13,14 @@ def rosenbrock(a, b, f0):
 
 
 def barier(r, g):
-    return lambda x: r * sum(-math.log(-gi(x)) for gi in g)
+    return lambda x: r * sum(1/gi(x) for gi in g)
 
 
 def penalty(r, g):
     return lambda x: r * sum([max(0, gi(x))**2 for gi in g]) / 2
 
-
-def F(ros, pen):
-    return lambda x: ros(x) + pen(x)
+def lagr_pen(mu,r,g):
+    return lambda x: sum([max(0,mu[i] + r*g[i])**2 - mu[i]**2 for i in range(len(x))])/(2*r)
 
 
 def constraints():
@@ -48,25 +47,40 @@ def constraints():
     return [g1, g2, g3, g4, g5]
 
 
-def barier_functions(x0, dx=numpy.array([10 ** -9 for i in range(4)]), eps=0.0001):
+def mixed(x0, eps=0.0000000001):
+    rosenbr = rosenbrock(30, 2, 80)
+
+    rb = 0.5
+    Cb = 10
+
+    r = 1
+    C = 10
+
+    cons = constraints()
+    while True:
+        bar = barier(rb, cons)
+        pen = penalty(r, cons)
+        added = lambda x: pen(x) - bar(x)
+        f = lambda x: rosenbr(x) + added(x)
+
+        x0 = scipy.optimize.minimize(f, x0, method='CG').x
+
+        if abs(added(x0)) <= eps:
+            return x0
+        else:
+            rb = rb / Cb
+            r = r * C
+
+def barier_functions(x0, eps=0.0000000001):
     rosenbr = rosenbrock(30, 2, 80)
     r = 0.5
     C = 10
     cons = constraints()
     while True:
-        # pen = barier(r, cons)
         bar = barier(r, cons)
         f = lambda x: rosenbr(x) - bar(x)
 
-        def prime(x):
-            grad_vec = []
-            for i in range(len(x0)):
-                tmp = numpy.zeros(len(x0))
-                tmp[i] = dx[i]
-                grad_vec.append(tmp)
-            return numpy.array([(f(x + grad_vec[i]) - f(x)) / dx[i] for i in range(len(x0))])
-
-        x0 = lab4_2.grad_descent(f, prime, x0, e1=eps, e2=eps, cons=constraints())
+        x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
         if abs(bar(x0)) <= eps:
             return x0
@@ -74,24 +88,16 @@ def barier_functions(x0, dx=numpy.array([10 ** -9 for i in range(4)]), eps=0.000
             r = r / C
 
 
-def penalty_functions(x0, dx=numpy.array([10 ** -9 for i in range(4)]), eps=0.0001):
+def penalty_functions(x0, eps=0.0000000001):
     rosenbr = rosenbrock(30, 2, 80)
     r = 1
-    C = 0.5
+    C = 10
     cons = constraints()
     while True:
         pen = penalty(r, cons)
-        f = F(rosenbr, pen)
+        f = lambda x: rosenbr(x) + pen(x)
 
-        def prime(x):
-            grad_vec = []
-            for i in range(len(x0)):
-                tmp = numpy.zeros(len(x0))
-                tmp[i] = dx[i]
-                grad_vec.append(tmp)
-            return numpy.array([(f(x + grad_vec[i]) - f(x)) / dx[i] for i in range(len(x0))])
-
-        x0 = lab4_2.fletcher_powell(f, prime, x0, e1=eps, e2=eps, delta=eps)
+        x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
         if pen(x0) <= eps:
             return x0
@@ -99,9 +105,26 @@ def penalty_functions(x0, dx=numpy.array([10 ** -9 for i in range(4)]), eps=0.00
             r = C * r
 
 
+def lagr(x0, eps= 10**-9):
+    r = 1
+    C = 2
+    cons = constraints()
+    mu = numpy.random.random(len(cons))
+    while True:
+        pen = lagr_pen(mu,r,cons)
+
+
+        x0 = scipy.optimize.minimize(f, x0, method='CG').x
+
+        if pen(x0) <= eps:
+            return x0
+        else:
+            r = C * r
+
 def main():
     print(penalty_functions(numpy.array([2, 2, 5, 2])))
     print(barier_functions(numpy.array([2, 2, 5, 2])))
+    print(mixed(numpy.array([2, 2, 5, 2])))
 
 
 if __name__ == "__main__":
