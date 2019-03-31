@@ -9,12 +9,11 @@ import lab4_1
 def rosenbrock(a, b, f0):
     def f(x):
         return sum([a * (x[i] ** 2 - x[i + 1]) ** 2 + b * (x[i] - 1) ** 2 for i in range(len(x) - 1)]) + f0
-
     return f
 
 
 def barier(r, g):
-    return lambda x: -r * sum(1/gi(x) for gi in g)
+    return lambda x: r * sum(-math.log(-gi(x)) for gi in g)
 
 
 def penalty(r, g):
@@ -57,7 +56,7 @@ def barier_functions(x0, dx=numpy.array([10 ** -9 for i in range(4)]), eps=0.000
     while True:
         # pen = barier(r, cons)
         bar = barier(r, cons)
-        f = lambda x: rosenbr(x) + bar(x)
+        f = lambda x: rosenbr(x) - bar(x)
 
         def prime(x):
             grad_vec = []
@@ -67,8 +66,8 @@ def barier_functions(x0, dx=numpy.array([10 ** -9 for i in range(4)]), eps=0.000
                 grad_vec.append(tmp)
             return numpy.array([(f(x + grad_vec[i]) - f(x)) / dx[i] for i in range(len(x0))])
 
-        x0 = lab4_2.grad_descent(f, prime, x0, e1=eps, e2=eps, delta=eps)
-        print(x0)
+        x0 = lab4_2.grad_descent(f, prime, x0, e1=eps, e2=eps, cons=constraints())
+
         if abs(bar(x0)) <= eps:
             return x0
         else:
