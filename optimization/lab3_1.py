@@ -5,7 +5,7 @@ def function(x):
     return 5 * x ** 6 - 36 * x ** 5 - 165 * x ** 4 / 2 - 60 * x ** 3 + 36
 
 
-def get_start_interval(f, x0, t, cons=None, vec_f=None):
+def get_start_interval(f, x0, t):
     y1, y2, y3 = f(x0 - t), f(x0), f(x0 + t)
 
     if y1 >= y2 and y2 <= y3:
@@ -29,12 +29,6 @@ def get_start_interval(f, x0, t, cons=None, vec_f=None):
 
     while True:
         x_next = x_start + 2 ** k * delta
-
-        if cons:
-            for c in cons:
-                print(c(vec_f(x_next)))
-                if not c(vec_f(x_next)) <= 0:
-                    break
 
         if f(x_next) < f(x_start):
             if delta == -t:

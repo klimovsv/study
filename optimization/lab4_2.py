@@ -55,7 +55,7 @@ def prime_rosenbrock(a, b):
     return f
 
 
-def grad_descent(f, grad, x0, e1=0.00001, e2=0.00001, cons=None):
+def grad_descent(f, grad, x0, e1=0.00001, e2=0.00001):
     x = [x0]
     i = 0
     while True:
@@ -64,9 +64,7 @@ def grad_descent(f, grad, x0, e1=0.00001, e2=0.00001, cons=None):
         vec_f = lambda t: x[i] + t * dir
         new_f = lambda t: f(vec_f(t))
 
-        interval = lab3_1.get_start_interval(new_f, 0, 10**-2, cons, vec_f)
-        alpha = lab3_1.golden(interval, new_f, e1)[0]
-        # alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
+        alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
 
         x.append(x[i] + alpha * dir)
         if numpy.linalg.norm(grad(x[i])) < e1 and abs(f(x[i + 1]) - f(x[i])) < e2:
