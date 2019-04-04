@@ -1,5 +1,7 @@
 from structs import *
 import random
+import sys
+from typing import *
 import matplotlib.pyplot as plt
 
 xrange = (2, 10)
@@ -45,8 +47,6 @@ def generate_new(edges: List[Edge], point: Point):
     edges_d = {}
 
     for edge in edges:
-        edge.unvisit()
-
         if not edge.a.id in edges_d:
             e = Edge(point, edge.a)
             edges_d[edge.a.id] = e
@@ -217,7 +217,7 @@ def generate_from_points(points, p):
 
 
 def init(xrange, yrange):
-    points = generate_points(xrange, yrange, 2, 1)
+    points = generate_points(xrange, yrange, 100, 1)
     ind = 0
     p = points[ind]
 
@@ -225,22 +225,22 @@ def init(xrange, yrange):
     n = 0
     lenx = xrange[1] - xrange[0]
     leny = yrange[1] - yrange[0]
-    p_s = [Point(xrange[0] - t, yrange[0] - t, edged=True)]
+    p_s = [Point(xrange[0] - t, yrange[0] - t)]
 
     for i in range(n):
         p_s.append(Point(xrange[0] + lenx / (n + 1) * (i + 1), yrange[0] - t))
 
-    p_s.append(Point(xrange[1] + t, yrange[0] - t, edged=True))
+    p_s.append(Point(xrange[1] + t, yrange[0] - t))
 
     for i in range(n):
         p_s.append(Point(xrange[1] + t, yrange[0] + leny / (n + 1) * (i + 1)))
 
-    p_s.append(Point(xrange[1] + t, yrange[1] + t, edged=True))
+    p_s.append(Point(xrange[1] + t, yrange[1] + t))
 
     for i in range(n):
         p_s.append(Point(xrange[1] - lenx / (n + 1) * (i + 1), yrange[1] + t))
 
-    p_s.append(Point(xrange[0] - t, yrange[1] + t, edged=True))
+    p_s.append(Point(xrange[0] - t, yrange[1] + t))
 
     for i in range(n):
         p_s.append(Point(xrange[0] - t, yrange[1] - leny / (n + 1) * (i + 1)))
