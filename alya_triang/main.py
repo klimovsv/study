@@ -43,6 +43,8 @@ def show_plot(triangles=None, points=None, vecs=None, circles=None):
 
 
 def generate_new(edges: List[Edge], point: Point):
+    # создание новых треугольников из списка ребер и точки
+    # с соблюдением согласованности ребер
     triangles = []
     edges_d = {}
 
@@ -67,17 +69,23 @@ def find(point, triangle: Triangle):
     while True:
         k += 1
         edges = triangle.edges
+        # берем любую точку внутри треугольника и
+        # проводим отрезок из нее к искомому треуугольнику
         center = triangle.point_inside()
         line = Vec(center, point)
         ind = -1
+
+        # находим ребро, которое пересекает отрезок
         for i, e in enumerate(edges):
             if line.intersect(Vec(e.a, e.b)):
                 ind = i
                 break
 
+        # если не пересекает => найден нужный треугольник
         if ind == -1:
-            return triangle,k
+            return triangle, k
 
+        # иначе переходим к следующему через пересеченное ребро
         triangle = edges[ind].get_another_triangle(triangle.id)
 
 
@@ -107,6 +115,7 @@ def get_common_edge(t1, t2):
 
 
 def main_loop(triangles: Dict[str, Triangle], points: List[Point]):
+    # инициализация начального дерева
     tree_root = kdtree(list(triangles.values()))
     count = 0
     iters = []
@@ -115,49 +124,62 @@ def main_loop(triangles: Dict[str, Triangle], points: List[Point]):
 
         best_node = [None]
         min_dist = [sys.maxsize]
+        # пытаемся найти треугольник в котором находится точка
         search(p, tree_root, best_node, min_dist)
         triangle = best_node[0].item
 
+        # если не находится в нем, то используем обычный поиск
+        # (в среднем доходим  за 2-3 итерации)
         if not p.inside(triangle):
             count += 1
             triangle , k = find(p, triangle)
             iters.append(k)
 
+        # удаляем найденный треугольник и информацию о нем из ребер
         triangles.pop(triangle.id)
         for e in triangle.edges:
             e.delete_triangle(triangle.id)
 
+        # создаем 3 новых, формируемых из точки и ребер старого треугольника
         new_t = generate_new(triangle.edges, p)
         for t in new_t:
             triangles[t.id] = t
 
+        # инициализируем очередь на проверку условий делоне
         next_triangles = new_t
 
-        circles = []
-        for t in list(triangles.values()):
-            cent = t.cent()
-            p1 = t.get_vertices()[0]
-            circles.append([cent, Vec(cent, p1).length()])
-
         while len(next_triangles) != 0:
+            # получаем следующий треугольник на проерку
             next_t = next_triangles.pop()
+
+            # если его уже нет в триангуляции, то пропускаем и берем следующий
             if not next_t.id in triangles:
                 continue
 
             neighbours = []
+            # сбор всех соседей у текущего треугольника
             for e in next_t.edges:
                 if not e.edged:
                     neighbours.append(e.get_another_triangle(next_t.id))
 
+            # проверка для каждого соседа уловия делоне
             for t in neighbours:
+                # находим общее ребро
                 edge = get_common_edge(t, next_t)
+                # оставшиеся ребра 1-го треугольника
                 aedges = next_t.get_other_edges(edge.id)
+                # оставшиеся ребра 2-го треугольника
                 bedges = t.get_other_edges(edge.id)
+                # находим противолежащие вершины
                 x = get_common_point(aedges[0], aedges[1])
                 y = get_common_point(bedges[0], bedges[1])
+                # если не выполняется условие делоне то перестраиваем
                 if not next_t.delauney(y) or not t.delauney(x):
+                    # формируем новое ребро между противолежащими вершинами
                     new_edge = Edge(x, y)
 
+                    # удаляем старые треугольники из триангуляции
+                    # а также информацию о них из ребер
                     triangles.pop(t.id)
                     for e in t.edges:
                         e.delete_triangle(t.id)
@@ -165,21 +187,28 @@ def main_loop(triangles: Dict[str, Triangle], points: List[Point]):
                     for e in next_t.edges:
                         e.delete_triangle(next_t.id)
 
+                    # формируем ребра для новых треугольников
                     edges1 = get_connected_edges(aedges[0], bedges)
                     edges2 = get_connected_edges(aedges[1], bedges)
 
+                    # создаем новые треугольники из данных ребер
                     t1 = Triangle()
                     t2 = Triangle()
                     t1.add_edges(new_edge, edges1[0], edges1[1])
                     t2.add_edges(new_edge, edges2[0], edges2[1])
 
+                    # добавляем треугольники в триангуляцию и в очередь проверки
                     next_triangles.append(t1)
                     triangles[t1.id] = t1
                     next_triangles.append(t2)
                     triangles[t2.id] = t2
                     break
 
+        # перестроение дерева с новыми треугольниками из триангуляции
         tree_root = kdtree(list(triangles.values()))
+    # статистика по общему количеству точек
+    # количеству точек, для которых не был найден точный треугольник при помощи дерева
+    # и среднее количество итерации на доп поиск
     print(len(points), count, np.average(iters))
     return triangles
 
@@ -217,14 +246,22 @@ def generate_from_points(points, p):
 
 
 def init(xrange, yrange):
+    # генерация точек на плоскости
+    # принимает отрезок по x, отрезок по y
+    # количество точек в разбиении плоскости
+    # и количество разбиений (формируется сетка NxN)
     points = generate_points(xrange, yrange, 100, 1)
     ind = 0
     p = points[ind]
 
     t = 0.2
-    n = 0
+    n = 1
     lenx = xrange[1] - xrange[0]
     leny = yrange[1] - yrange[0]
+
+    # создание суперструктуры прямоугольника
+    # с равномерно распределенными точками по периметру
+    # количество точек на ребрах прямоугольнкиа - n
     p_s = [Point(xrange[0] - t, yrange[0] - t)]
 
     for i in range(n):

@@ -26,6 +26,7 @@ class Vec:
         return Line2D([self.a.x, self.b.x], [self.a.y, self.b.y])
 
     def intersect(self, other):
+        # пересечение с другим отрезком
         start1 = self.a
         start2 = other.a
         end1 = self.b
@@ -91,6 +92,7 @@ class Point:
         return Point(self.x + other.x, self.y + other.y)
 
     def inside(self, t):
+        # проверка на принадлежность точки треугольнику
         triangle = Path([(p.x, p.y) for p in t.p])
         points = np.array([self.x, self.y]).reshape(1, 2)
         res = triangle.contains_points(points)
@@ -196,6 +198,8 @@ def search(point, node, best_node, min_dist):
     if node is None:
         return
 
+    # обновление лучшего треуголника в зависимости
+    # от расстояния от точки до центра
     d = Vec(point, node.item.centroid()).length()
     if d < min_dist[0]:
         best_node[0] = node
@@ -221,12 +225,17 @@ def kdtree(triangles, depth=0):
 
     k = 2
     axis = 'x' if depth % k == 0 else 'y'
+    # сортировка треуголников по их центру и выбранной оси
     triangles.sort(key=operator.attrgetter(axis))
+    # выбор медианы
     median = len(triangles) // 2
 
+    # создание вершины дерева
     return Node(
         item=triangles[median],
         axis=axis,
+        # в левую ветку отправляются треуголники слева от медианы
         left=kdtree(triangles[:median], depth + 1),
+        # в правую - справа
         right=kdtree(triangles[median + 1:], depth + 1)
     )
