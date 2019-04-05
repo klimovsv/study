@@ -5,21 +5,6 @@ import lab3_1
 import scipy.optimize
 
 
-def rosenbrock_func(n):
-    x = []
-    for i in range(n):
-        x.append(sympy.Symbol('x' + str(i)))
-
-    a_s = sympy.Symbol('a')
-    b_s = sympy.Symbol('b')
-    f_s = sympy.Symbol('f')
-
-    sum = f_s
-    for i in range(n - 1):
-        sum += a_s * (x[i] ** 2 - x[i + 1]) ** 2 + b_s * (x[i] - 1) ** 2
-    return sum
-
-
 def hessian(a, b):
     def f(x):
         x0, x1, x2, x3 = x
@@ -55,22 +40,25 @@ def prime_rosenbrock(a, b):
     return f
 
 
-def grad_descent(f, grad, x0, e1=0.00001, e2=0.00001):
+def grad_descent(f, grad, x0, e1=0.00001, e2=0.00001, max_iters=1000):
     x = [x0]
     i = 0
-    while True:
+    while i < max_iters:
         dir = -grad(x[i])
 
         vec_f = lambda t: x[i] + t * dir
         new_f = lambda t: f(vec_f(t))
 
-        alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
+        interval = lab3_1.get_start_interval(new_f, 0)
+        alpha = lab3_1.golden(interval, new_f)[0]
+        # alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
 
         x.append(x[i] + alpha * dir)
         if numpy.linalg.norm(grad(x[i])) < e1 and abs(f(x[i + 1]) - f(x[i])) < e2:
             return x[i + 1]
 
         i += 1
+    return x[-1]
 
 
 def fletcher_powell(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.000001, max_iters=100000):
@@ -93,15 +81,18 @@ def fletcher_powell(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.000001, max_ite
         dir.append(numpy.matmul(-A[i + 1], numpy.array([grad(x[i + 1])]).transpose()).transpose()[0])
 
         new_f = lambda t: f(x[i + 1] + t * dir[i + 1])
-        alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
+
+        interval = lab3_1.get_start_interval(new_f, 0)
+        alpha = lab3_1.golden(interval, new_f)[0]
+        # alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
         x.append(x[i + 1] + alpha * dir[i + 1])
 
         if numpy.linalg.norm(grad(x[i + 1])) < e1 and abs(f(x[i + 2]) - f(x[i + 1])) < e2:
-            return x[i + 2]
+            return x[i + 2],i+2
 
         i += 1
 
-    return x[-1]
+    return x[-1], len(x)
 
 
 def fletcher_reevs(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.00001, max_iters=100000):
@@ -117,11 +108,15 @@ def fletcher_reevs(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.00001, max_iters
             -grad(x[i + 1]) + (numpy.linalg.norm(grad(x[i + 1]))) ** 2 / (numpy.linalg.norm(grad(x[i]))) ** 2 * dir[i])
 
         new_f = lambda t: f(x[i + 1] + t * dir[i + 1])
-        alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
+        interval = lab3_1.get_start_interval(new_f, 0)
+        alpha = lab3_1.golden(interval, new_f)[0]
+        # print(alpha)
+        # alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
         x.append(x[i + 1] + alpha * dir[i + 1])
+        # print(x[-1])
 
         if numpy.linalg.norm(grad(x[i + 1])) < e1 and abs(f(x[i + 2]) - f(x[i + 1])) < e2:
-            return x[i + 2]
+            return x[i + 2],i+2
 
         i += 1
 
@@ -136,7 +131,9 @@ def levenberg_marquardt(f, grad, hessian, x0, e1=0.00001, e2=0.00001, max_iters=
         dir = numpy.matmul(-numpy.linalg.inv(hi + l * numpy.eye(len(x0))), numpy.array([gi]).transpose()).transpose()[0]
 
         new_f = lambda t: f(x[i] + t * dir)
-        alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
+
+        interval = lab3_1.get_start_interval(new_f, 0)
+        alpha = lab3_1.golden(interval, new_f)[0]
         x.append(x[i] + alpha * dir)
 
         if f(x[i + 1]) < f(x[i]):
@@ -145,14 +142,11 @@ def levenberg_marquardt(f, grad, hessian, x0, e1=0.00001, e2=0.00001, max_iters=
             l = 2 * l
 
         if numpy.linalg.norm(grad(x[i])) < e2 and abs(f(x[i + 1]) - f(x[i])) < e1:
-            return x[i + 1]
+            return x[i + 1], i+1
         i += 1
 
 
 def main():
-    func = rosenbrock(30, 2, 80)
-    print(rosenbrock_func(4))
-    # print(func([1, 1]))
     print(grad_descent(rosenbrock(30, 2, 80),
                        prime_rosenbrock(30, 2),
                        numpy.array([3, 2, 3, 2]),

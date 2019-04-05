@@ -5,7 +5,7 @@ def function(x):
     return 5 * x ** 6 - 36 * x ** 5 - 165 * x ** 4 / 2 - 60 * x ** 3 + 36
 
 
-def get_start_interval(f, x0, t):
+def get_start_interval(f, x0, t=0.001):
     y1, y2, y3 = f(x0 - t), f(x0), f(x0 + t)
 
     if y1 >= y2 and y2 <= y3:
@@ -71,7 +71,7 @@ def bisection(interval, f, eps, k=1):
         return bisection([y, z], f, eps, k + 1)
 
 
-def golden(interval, f, eps, k=1):
+def golden(interval, f, eps=10**-8, k=1):
     a, b = interval[0], interval[1]
 
     if (b - a) <= eps:

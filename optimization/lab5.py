@@ -1,16 +1,32 @@
 import numpy
+from numpy.linalg import inv
 import scipy.optimize
 import math
 import scipy.misc
 import lab4_2
+import lab3_2
 import lab4_1
-from goto import with_goto
+
+
+
 
 def rosenbrock(a, b, f0):
     def f(x):
         return sum([a * (x[i] ** 2 - x[i + 1]) ** 2 + b * (x[i] - 1) ** 2 for i in range(len(x) - 1)]) + f0
 
     return f
+
+
+def gradient(fun, tol=10 ** -8):
+    def func(x):
+        res = []
+        for i in range(len(x)):
+            tmp = numpy.copy(x)
+            tmp[i] += tol
+            res.append((fun(tmp) - fun(x)) / tol)
+        return numpy.array(res)
+
+    return func
 
 
 def prime_rosenbrock(a, b):
@@ -89,18 +105,22 @@ def mixed(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
 
     r = 1
     C = 10
-
+    k = 0
+    x0 = x0.tolist()
     cons = constraints()
     while True:
+        k+=1
         bar = barier(rb, cons)
         pen = penalty(r, cons)
         added = lambda x: pen(x) - bar(x)
         f = lambda x: func(x) + added(x)
 
-        x0 = scipy.optimize.minimize(f, x0, method='CG').x
+        # x0 = lab4_1.hooke_jeeves(f, x0)
+        x0 = lab4_2.grad_descent(f, gradient(f), x0)
+        # x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
         if abs(added(x0)) <= eps:
-            return x0
+            return x0,k
         else:
             rb = rb / Cb
             r = r * C
@@ -109,15 +129,22 @@ def mixed(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
 def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
     r = 0.5
     C = 10
+    k=0
     cons = constraints()
+
+    x0 = x0.tolist()
     while True:
+        k+=1
         bar = barier(r, cons)
         f = lambda x: func(x) - bar(x)
 
-        x0 = scipy.optimize.minimize(f, x0, method='CG').x
+        x0 = lab4_2.grad_descent(f, gradient(f), x0)
+        # x0 = lab4_1.hooke_jeeves(f, x0)
+        # print(x0)
+        # x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
         if abs(bar(x0)) <= eps:
-            return x0
+            return x0,k
         else:
             r = r / C
 
@@ -126,14 +153,18 @@ def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
     r = 1
     C = 10
     cons = constraints()
+    k = 0
+    x0 = x0.tolist()
     while True:
+        k+=1
         pen = penalty(r, cons)
         f = lambda x: func(x) + pen(x)
 
-        x0 = scipy.optimize.minimize(f, x0, method='CG').x
+        x0 = lab4_1.hooke_jeeves(f, x0)
+        # x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
-        if pen(x0) <= eps:
-            return x0
+        if abs(pen(x0)) <= eps:
+            return x0,k
         else:
             r = C * r
 
@@ -141,37 +172,95 @@ def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
 def lagr(x0, func=rosenbrock(30, 2, 80), eps=10 ** -9):
     r = 1
     C = 2
+    k=0
     cons = constraints()
     mu = numpy.random.random(len(cons))
+    x0 = x0.tolist()
     while True:
+        k+=1
         pen = lagr_pen(mu, r, cons)
         f = lambda x: func(x) + pen(x)
 
-        x0 = scipy.optimize.minimize(f, x0, method='CG').x
+        x0 = lab4_2.grad_descent(f, gradient(f), x0)
 
-        if pen(x0) <= eps:
-            return x0
+        if abs(pen(x0)) <= eps:
+            return x0,k
         else:
             mu = numpy.array([max(0, mu[i] + r * cons[i](x0)) for i in range(len(mu))])
             r = C * r
 
-@with_goto
-def projection(x0, e1, e2, max_iters):
-    cons = constraints()
 
+def projection(f, x0, e1 = -10,e=10 ** -8, max_iter=100):
+    x = x0
+    k = 0
+    case = 0
+    deltax = numpy.array([0.0001,0.0001,0.0001,0.0001])
+    g = g_array()
+    dg = g_der()
+    gradf = prime_rosenbrock(30,2)
+    id = numpy.eye(5)
+    numpy.delete(id, 4)
+
+    while k < max_iter:
+        k += 1
+        for gf in g:
+            if e1 <= gf(x) <= 0:
+                case = 1
+                break
+        if case:
+            gf = gradf(x)
+            A = dg(x)
+            if numpy.all(gf == 0):
+                print(2)
+                la = numpy.matmul(numpy.matmul(inv(numpy.matmul(dg(x), A.transpose())), A),
+                                  numpy.array([gradf(x).tolist()]).transpose()).transpose().reshape(-1)
+                if la <= 0:
+                    return [k, x, f(x)]
+                max_la = 0
+                max_i = 0
+                for i, elem in enumerate(la):
+                    if elem < 0:
+                        max_la = min([max_la, elem])
+                        max_i = i
+                numpy.delete(A, max_i)
+            else:
+                print(1)
+                deltax = - inv(id - numpy.matmul(A.transpose(), numpy.matmul(A, A.transpose())))
+                if deltax < e:
+                    la = numpy.matmul(numpy.matmul(inv(numpy.matmul(dg(x), A.transpose())), A),
+                                      numpy.array([gradf(x).tolist()]).transpose()).transpose().reshape(-1)
+
+                    if la <= 0:
+                        return [k, x, f(x)]
+                    max_la = 0
+                    max_i = 0
+                    for i, elem in enumerate(la):
+                        if elem < 0:
+                            max_la = min([max_la, elem])
+                            max_i = i
+                    numpy.delete(A, max_i)
+            helper = lambda alpha: x + alpha * deltax
+            alpha = scipy.optimize.minimize_scalar(helper, method='Golden')
+            x = x + alpha * deltax
+
+    return [k, x, f(x)]
 
 
 def main():
     target = numpy.array([1, 1, 1, 1])
-    x0 = numpy.array([2, 2, 5, 2])
+    # print(numpy.array([g(target) for g in prime_constraints()]))
+    x0 = numpy.array([0.7, 0.7, 0.7, 0.7])
+
+    # print(projection(rosenbrock(30, 2, 80), numpy.array([1,2,1,1])))
+
     pen = penalty_functions(x0)
+    print(numpy.abs(pen[0]), pen[1])
     bar = barier_functions(x0)
+    print(numpy.abs(bar[0]), bar[1])
     m = mixed(x0)
+    print(numpy.abs(m[0]), m[1])
     l = lagr(x0)
-    print(numpy.abs(target - pen))
-    print(numpy.abs(target - bar))
-    print(numpy.abs(target - m))
-    print(numpy.abs(target - l))
+    print(numpy.abs(l[0]), l[1])
 
 
 if __name__ == "__main__":

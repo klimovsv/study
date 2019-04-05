@@ -1,9 +1,10 @@
 import copy
-import scipy.optimize
 import numpy
 import math
 import lab3_1
 import operator
+
+
 # from goto import with_goto
 
 def rosenbrock(a, b, f0):
@@ -53,89 +54,75 @@ def find_new(x0, delta, n, f):
     return x_next
 
 
-def next_point(x1, x2, l):
-    x3 = []
-    for x1i, x2i in zip(x1, x2):
-        x3.append(x1i + l * (x2i - x1i))
-    return x3
-
-
 def mass_cent(simplex, h):
-    return (sum(simplex) - simplex[h]) / len(simplex)
+    return (sum(simplex) - simplex[h]) / (len(simplex) - 1)
 
-def condition(simplex, l_ind, eps , f):
+
+def condition(simplex, l_ind, eps, f):
     res = 0
     for i, x in enumerate(simplex):
-        res += (f(simplex[i]) - f(simplex[l_ind]))**2
-    return math.sqrt(res/(len(simplex)+1)) <= eps
+        res += (f(simplex[i]) - f(simplex[l_ind])) ** 2
+    return math.sqrt(res / (len(simplex) + 1)) <= eps
 
-# @with_goto
-def nelder_mead(f, x0, alpha=1, beta=0.5, gamma=2, mu=0.0001, phi=0.01, eps=0.0001):
-    pass
-    # n = len(x0)
-    # simplex = [x0]
-    # k = 0
-    #
-    # s = 0.1
-    # l1 = s * (math.sqrt(n + 1) + n - 1) / (n * math.sqrt(2))
-    # l2 = s * (math.sqrt(n + 1) - 1) / (n * math.sqrt(2))
-    #
-    # for i in range(n):
-    #     li_arr = [l2 for i in range(n)]
-    #     li_arr[i] = l1
-    #     simplex.append(x0 + numpy.array(li_arr))
-    #
-    # label .step1
-    # print("step1")
-    # simplex.sort(key=lambda v: f(v))
-    #
-    #
-    #
-    # label .step2
-    # print("step2")
-    # x_cent = (sum(simplex) - simplex[-1])/n
-    #
-    # label .step3
-    # print("step3")
-    # xr = x_cent + alpha*(x_cent - simplex[-1])
-    # if f(xr) <= f(simplex[-2]):
-    #     simplex[-1] = xr
-    #     goto .step1
-    #
-    # label .step31
-    #
-    # print("step31")
-    # if f(xr) <= f(simplex[0]):
-    #     xe = x_cent + gamma*(x_cent - simplex[-1])
-    #     if f(xe) <= f(xr):
-    #         simplex[-1] = xe
-    #         goto .step1
-    #     else:
-    #         simplex[-1] = xr
-    # else:
-    #     goto .step5
-    #
-    # label .step4
-    # print("step4")
-    # x_cont = x_cent + beta * (x_cent - simplex[-1])
-    # if f(x_cont) <= f(simplex[-1]):
-    #     simplex[-1] =x_cont
-    #     goto .step1
-    #
-    # label .step5
-    #
-    # for i in range(1,len(simplex)):
-    #     simplex[i] = simplex[0] + mu * (simplex[i] - simplex[0])
-    #
-    # print("step5")
-    # if sum(map(lambda x: (f(x) - f(x_cent))**2, simplex))/(n+1) <= eps:
-    #     return simplex[0]
-    #
-    # goto .step1
-    #
 
-def hooke_jeeves(f, x0, eps=0.00001, delta=[0.001,0.001,0.001,0.001], l=2, beta=2, n=4):
-    while True:
+def nelder_mead(f, x0, alpha=1, beta=0.5, gamma=2, delta=0.5, mu=0.0001, phi=0.01, eps=10**-8, maxiters=100000):
+    n = len(x0)
+    simx = [x0]
+    k = 0
+
+    s = 0.1
+    l1 = s * (math.sqrt(n + 1) + n - 1) / (n * math.sqrt(2))
+    l2 = s * (math.sqrt(n + 1) - 1) / (n * math.sqrt(2))
+
+    for i in range(n):
+        li_arr = [l2 for i in range(n)]
+        li_arr[i] = l1
+        simx.append(x0 + numpy.array(li_arr))
+
+    def sort(lst):
+        d = [(x, f(x)) for x in lst]
+        d.sort(key=operator.itemgetter(1))
+        lst = list(map(operator.itemgetter(0), d))
+        return lst
+
+    while k < maxiters:
+        k += 1
+
+
+
+        simx = sort(simx)
+        xc = mass_cent(simx, n)
+
+        if sum([(f(x) - f(xc)) ** 2 for x in simx]) / (n + 1) <= eps:
+            return simx[0],k
+
+        #exp reflection
+        xr = xc + alpha * (xc - simx[-1])
+        xe = xr + gamma * (xr - xc)
+        if f(xr) < f(simx[-1]) or f(xe) < f(simx[-1]):
+            minx = min(xr, xe, key=f)
+            simx[-1] = minx
+            continue
+
+        #contraction
+        c1 = (simx[-1] + xc)/2
+        c2 = (xc + xr)/2
+        if f(c1) < f(simx[-1]) or f(c2) < f(simx[-1]):
+            minx = min(c1, c2, key=f)
+            simx[-1] = minx
+            continue
+
+        for i in range(1, len(simx)):
+            simx[i] = simx[0] + mu * (simx[i] - simx[0])
+
+
+    return simx[0], k
+
+
+def hooke_jeeves(f, x0, eps=10 ** -8, delta=[0.001, 0.001, 0.001, 0.001], l=2, beta=2, n=4, max_iters=10000):
+    k = 0
+    while k < max_iters:
+        k += 1
         x_next = find_new(x0, delta, n, f)
 
         if x_next == x0:
@@ -152,13 +139,16 @@ def hooke_jeeves(f, x0, eps=0.00001, delta=[0.001,0.001,0.001,0.001], l=2, beta=
         dir = [l * (x2 - x1) for x2, x1 in zip(x_next, x0)]
 
         new_f = to_scipy(f, x0, dir)
-        res = scipy.optimize.minimize_scalar(new_f, method='Golden').x
+        res = lab3_1.golden([0, 2], new_f)[0]
 
         x0 = (numpy.array(x0) + res * numpy.array(dir)).tolist()
 
+    return x_next
+
 
 def main():
-    print(nelder_mead(rosenbrock(30, 2, 80), numpy.array([2, 2, 2, 2])))
+    print(hooke_jeeves(rosenbrock(30, 2, 80), [1, 3, 2, 1]))
+    print(nelder_mead(rosenbrock(30, 2, 80), numpy.array([0.5, 0.5, 0.5, 0.5])))
 
 
 if __name__ == "__main__":
