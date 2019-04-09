@@ -99,7 +99,7 @@ def constraints():
     return [g1, g2, g3, g4, g5]
 
 
-def mixed(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
+def mixed(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
     rb = 0.5
     Cb = 10
 
@@ -126,7 +126,7 @@ def mixed(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
             r = r * C
 
 
-def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
+def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
     r = 0.5
     C = 10
     k=0
@@ -149,7 +149,7 @@ def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
             r = r / C
 
 
-def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
+def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
     r = 1
     C = 10
     cons = constraints()
@@ -161,7 +161,6 @@ def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
         f = lambda x: func(x) + pen(x)
 
         x0 = lab4_1.hooke_jeeves(f, x0)
-        # x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
         if abs(pen(x0)) <= eps:
             return x0,k
@@ -169,7 +168,7 @@ def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=0.0000000001):
             r = C * r
 
 
-def lagr(x0, func=rosenbrock(30, 2, 80), eps=10 ** -9):
+def lagr(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
     r = 1
     C = 2
     k=0
@@ -195,8 +194,8 @@ def projection(f, x0, e1 = -10,e=10 ** -8, max_iter=100):
     k = 0
     case = 0
     deltax = numpy.array([0.0001,0.0001,0.0001,0.0001])
-    g = g_array()
-    dg = g_der()
+    g = constraints()
+    dg = prime_constraints()
     gradf = prime_rosenbrock(30,2)
     id = numpy.eye(5)
     numpy.delete(id, 4)
@@ -250,17 +249,18 @@ def main():
     target = numpy.array([1, 1, 1, 1])
     # print(numpy.array([g(target) for g in prime_constraints()]))
     x0 = numpy.array([0.7, 0.7, 0.7, 0.7])
+    f = rosenbrock(30,2,80)
+    # pen = penalty_functions(x0)
+    # print(numpy.abs(pen[0]), pen[1], f(pen[0]))
+    # bar = barier_functions(x0)
+    # print(numpy.abs(bar[0]), bar[1], f(bar[0]))
+    # m = mixed(x0)
+    # print(numpy.abs(m[0]), m[1], f(m[0]))
+    # l = lagr(x0)
+    # print(numpy.abs(l[0]), l[1], f(l[0]))
 
-    # print(projection(rosenbrock(30, 2, 80), numpy.array([1,2,1,1])))
-
-    pen = penalty_functions(x0)
-    print(numpy.abs(pen[0]), pen[1])
-    bar = barier_functions(x0)
-    print(numpy.abs(bar[0]), bar[1])
-    m = mixed(x0)
-    print(numpy.abs(m[0]), m[1])
-    l = lagr(x0)
-    print(numpy.abs(l[0]), l[1])
+    proj = barier_functions(numpy.array([3,2,3,5]))
+    print(proj, f(proj[0]))
 
 
 if __name__ == "__main__":

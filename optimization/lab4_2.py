@@ -40,7 +40,7 @@ def prime_rosenbrock(a, b):
     return f
 
 
-def grad_descent(f, grad, x0, e1=0.00001, e2=0.00001, max_iters=1000):
+def grad_descent(f, grad, x0, e1=10**-5, e2=10**-5, max_iters=1000000):
     x = [x0]
     i = 0
     while i < max_iters:
@@ -51,7 +51,6 @@ def grad_descent(f, grad, x0, e1=0.00001, e2=0.00001, max_iters=1000):
 
         interval = lab3_1.get_start_interval(new_f, 0)
         alpha = lab3_1.golden(interval, new_f)[0]
-        # alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
 
         x.append(x[i] + alpha * dir)
         if numpy.linalg.norm(grad(x[i])) < e1 and abs(f(x[i + 1]) - f(x[i])) < e2:
@@ -61,7 +60,7 @@ def grad_descent(f, grad, x0, e1=0.00001, e2=0.00001, max_iters=1000):
     return x[-1]
 
 
-def fletcher_powell(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.000001, max_iters=100000):
+def fletcher_powell(f, grad, x0, e1=10**-5, e2=10**-5, delta=0.000001, max_iters=100000):
     x = [x0]
     i = 0
     A = [numpy.eye(len(x0))]
@@ -84,18 +83,17 @@ def fletcher_powell(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.000001, max_ite
 
         interval = lab3_1.get_start_interval(new_f, 0)
         alpha = lab3_1.golden(interval, new_f)[0]
-        # alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
         x.append(x[i + 1] + alpha * dir[i + 1])
 
         if numpy.linalg.norm(grad(x[i + 1])) < e1 and abs(f(x[i + 2]) - f(x[i + 1])) < e2:
-            return x[i + 2],i+2
+            return x[i + 2], i+2
 
         i += 1
 
     return x[-1], len(x)
 
 
-def fletcher_reevs(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.00001, max_iters=100000):
+def fletcher_reevs(f, grad, x0, e1=10**-5, e2=10**-5):
     x = [x0]
     i = 0
     dir = [-grad(x0)]
@@ -110,18 +108,14 @@ def fletcher_reevs(f, grad, x0, e1=0.00001, e2=0.00001, delta=0.00001, max_iters
         new_f = lambda t: f(x[i + 1] + t * dir[i + 1])
         interval = lab3_1.get_start_interval(new_f, 0)
         alpha = lab3_1.golden(interval, new_f)[0]
-        # print(alpha)
-        # alpha = scipy.optimize.minimize_scalar(new_f, method='Golden').x
         x.append(x[i + 1] + alpha * dir[i + 1])
-        # print(x[-1])
-
         if numpy.linalg.norm(grad(x[i + 1])) < e1 and abs(f(x[i + 2]) - f(x[i + 1])) < e2:
-            return x[i + 2],i+2
+            return x[i + 2], i+2
 
         i += 1
 
 
-def levenberg_marquardt(f, grad, hessian, x0, e1=0.00001, e2=0.00001, max_iters=100000):
+def levenberg_marquardt(f, grad, hessian, x0, e1=10**-5, e2=10**-5, max_iters=100000):
     x = [x0]
     l = 2
     i = 0
@@ -132,8 +126,8 @@ def levenberg_marquardt(f, grad, hessian, x0, e1=0.00001, e2=0.00001, max_iters=
 
         new_f = lambda t: f(x[i] + t * dir)
 
-        interval = lab3_1.get_start_interval(new_f, 0)
-        alpha = lab3_1.golden(interval, new_f)[0]
+        # interval = lab3_1.get_start_interval(new_f, 0)
+        alpha = lab3_1.golden([0,2], new_f)[0]
         x.append(x[i] + alpha * dir)
 
         if f(x[i + 1]) < f(x[i]):
@@ -147,23 +141,28 @@ def levenberg_marquardt(f, grad, hessian, x0, e1=0.00001, e2=0.00001, max_iters=
 
 
 def main():
-    print(grad_descent(rosenbrock(30, 2, 80),
+    f = rosenbrock(30,2,80)
+    gd = grad_descent(rosenbrock(30, 2, 80),
                        prime_rosenbrock(30, 2),
                        numpy.array([3, 2, 3, 2]),
-                       ))
-    print(fletcher_reevs(rosenbrock(30, 2, 80),
+                       )
+    print(gd, f(gd))
+    fv = fletcher_reevs(rosenbrock(30, 2, 80),
                          prime_rosenbrock(30, 2),
                          numpy.array([3, 2, 3, 2]),
-                         ))
-    print(fletcher_powell(rosenbrock(30, 2, 80),
+                         )
+    print(fv, f(fv[0]))
+    fp = fletcher_powell(rosenbrock(30, 2, 80),
                           prime_rosenbrock(30, 2),
                           numpy.array([3, 2, 3, 2]),
-                          ))
-    print(levenberg_marquardt(rosenbrock(30, 2, 80),
+                          )
+    print(fp, f(fp[0]))
+    lm = levenberg_marquardt(rosenbrock(30, 2, 80),
                               prime_rosenbrock(30, 2),
                               hessian(30, 2),
-                              numpy.array([3, 2, 3, 2]),
-                              ))
+                              numpy.array([0.7, 0.7,0.7, 0.7]),
+                              )
+    print(lm, f(lm[0]))
 
 
 if __name__ == "__main__":

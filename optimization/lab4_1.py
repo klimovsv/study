@@ -27,13 +27,6 @@ def to_scipy(f, x, dir):
     return new_f
 
 
-def dir_step(x, delta, factor):
-    tmp = []
-    for i in range(len(x)):
-        tmp.append(step(x, delta, i, factor)[i])
-    return tmp
-
-
 def step(x, delta, i, factor):
     tmp = copy.copy(x)
     tmp[i] += delta[i] * factor
@@ -58,14 +51,7 @@ def mass_cent(simplex, h):
     return (sum(simplex) - simplex[h]) / (len(simplex) - 1)
 
 
-def condition(simplex, l_ind, eps, f):
-    res = 0
-    for i, x in enumerate(simplex):
-        res += (f(simplex[i]) - f(simplex[l_ind])) ** 2
-    return math.sqrt(res / (len(simplex) + 1)) <= eps
-
-
-def nelder_mead(f, x0, alpha=1, beta=0.5, gamma=2, delta=0.5, mu=0.0001, phi=0.01, eps=10**-8, maxiters=100000):
+def nelder_mead(f, x0, alpha=1, beta=0.5, gamma=2, delta=0.5, mu=0.0001, phi=0.01, eps=10**-5, maxiters=100000):
     n = len(x0)
     simx = [x0]
     k = 0
@@ -119,7 +105,7 @@ def nelder_mead(f, x0, alpha=1, beta=0.5, gamma=2, delta=0.5, mu=0.0001, phi=0.0
     return simx[0], k
 
 
-def hooke_jeeves(f, x0, eps=10 ** -8, delta=[0.001, 0.001, 0.001, 0.001], l=2, beta=2, n=4, max_iters=10000):
+def hooke_jeeves(f, x0, eps=10**-5, delta=[0.001, 0.001, 0.001, 0.001], l=2, beta=2, n=4, max_iters=10000):
     k = 0
     while k < max_iters:
         k += 1
@@ -147,8 +133,11 @@ def hooke_jeeves(f, x0, eps=10 ** -8, delta=[0.001, 0.001, 0.001, 0.001], l=2, b
 
 
 def main():
-    print(hooke_jeeves(rosenbrock(30, 2, 80), [1, 3, 2, 1]))
-    print(nelder_mead(rosenbrock(30, 2, 80), numpy.array([0.5, 0.5, 0.5, 0.5])))
+    f = rosenbrock(30, 2, 80)
+    hj = hooke_jeeves(rosenbrock(30, 2, 80), [1, 3, 2, 1])
+    print(hj, f(hj[0]))
+    nm = nelder_mead(rosenbrock(30, 2, 80), numpy.array([0.5, 0.5, 0.5, 0.5]))
+    print(nm,f(nm[0]))
 
 
 if __name__ == "__main__":
