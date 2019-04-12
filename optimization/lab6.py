@@ -2,17 +2,10 @@ import numpy as np
 import operator
 
 
-def c():
-    return
-
-
-def b():
-    return
-
-
-def simplex(A, c, b, b_idx, n_idx, eps=10 ** -3):
+def simplex(A, c, b, b_idx, eps=10 ** -3):
     k = 0
     max_iters = A.shape[0] * 5
+    n_idx = [i for i in range(A.shape[1]) if i not in b_idx]
 
     def get_cb():
         return c[:, b_idx]
@@ -52,11 +45,38 @@ def simplex(A, c, b, b_idx, n_idx, eps=10 ** -3):
         alphq = (Binv @ A[:, q]).reshape(-1)
         beta = xb.reshape(-1)
         filtered = list(filter(lambda x: x[1][1] > 0, [(i, v) for i, v in enumerate(zip(beta, alphq))]))
+
+        if len(filtered) == 0:
+            return None, None
+
         p_ind = min(filtered, key=lambda v: v[1][0] / v[1][1])[0]
         p = b_idx[p_ind]
 
         b_idx[p_ind] = q
         n_idx[q_ind] = p
+
+
+def get_basis(A, c, b):
+    m = A.shape[0]
+    n = A.shape[1]
+    A = A.tolist()
+    c = c.tolist()
+    M = 1000
+    for i in range(m):
+        added = [0] * m
+        added[i] = 1
+        A[i] += added
+
+    c[0] += [-M] * m
+    A = np.array(A)
+    c = np.array(c)
+    basis = simplex(A, c, b, [i + n for i in range(m)])[0]
+    return list(map(operator.itemgetter(0), filter(lambda x: x[1] != 0, enumerate(basis))))
+
+
+def two_step_simplex(A, b, c):
+    basis = get_basis(A, c, b)
+    return simplex(A, c, b, basis)
 
 
 def main():
@@ -70,9 +90,7 @@ def main():
         [12]
     ])
 
-    n_idx = [0, 1]
-    b_idx = [2, 3]
-    res = simplex(A, c, b, b_idx, n_idx)
+    res = two_step_simplex(A, b, c)
     print(res)
     import scipy.optimize
     res = scipy.optimize.linprog(-c.reshape(-1), A_eq=A, b_eq=b.reshape(-1)).x
