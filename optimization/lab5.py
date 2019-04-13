@@ -8,8 +8,6 @@ import lab3_2
 import lab4_1
 
 
-
-
 def rosenbrock(a, b, f0):
     def f(x):
         return sum([a * (x[i] ** 2 - x[i + 1]) ** 2 + b * (x[i] - 1) ** 2 for i in range(len(x) - 1)]) + f0
@@ -99,7 +97,7 @@ def constraints():
     return [g1, g2, g3, g4, g5]
 
 
-def mixed(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
+def mixed(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8):
     rb = 0.5
     Cb = 10
 
@@ -109,7 +107,7 @@ def mixed(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
     x0 = x0.tolist()
     cons = constraints()
     while True:
-        k+=1
+        k += 1
         bar = barier(rb, cons)
         pen = penalty(r, cons)
         added = lambda x: pen(x) - bar(x)
@@ -120,21 +118,21 @@ def mixed(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
         # x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
         if abs(added(x0)) <= eps:
-            return x0,k
+            return x0, k
         else:
             rb = rb / Cb
             r = r * C
 
 
-def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
+def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8):
     r = 0.5
     C = 10
-    k=0
+    k = 0
     cons = constraints()
 
     x0 = x0.tolist()
     while True:
-        k+=1
+        k += 1
         bar = barier(r, cons)
         f = lambda x: func(x) - bar(x)
 
@@ -144,59 +142,58 @@ def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
         # x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
         if abs(bar(x0)) <= eps:
-            return x0,k
+            return x0, k
         else:
             r = r / C
 
 
-def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
+def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8):
     r = 1
     C = 10
-    cons = constraints()
+    cons = []
     k = 0
     x0 = x0.tolist()
     while True:
-        k+=1
+        k += 1
         pen = penalty(r, cons)
         f = lambda x: func(x) + pen(x)
-
-        x0 = lab4_1.hooke_jeeves(f, x0)
+        x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
         if abs(pen(x0)) <= eps:
-            return x0,k
+            return x0, k
         else:
             r = C * r
 
 
-def lagr(x0, func=rosenbrock(30, 2, 80), eps=10**-8):
+def lagr(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8):
     r = 1
     C = 2
-    k=0
+    k = 0
     cons = constraints()
     mu = numpy.random.random(len(cons))
     x0 = x0.tolist()
     while True:
-        k+=1
+        k += 1
         pen = lagr_pen(mu, r, cons)
         f = lambda x: func(x) + pen(x)
 
         x0 = lab4_2.grad_descent(f, gradient(f), x0)
 
         if abs(pen(x0)) <= eps:
-            return x0,k
+            return x0, k
         else:
             mu = numpy.array([max(0, mu[i] + r * cons[i](x0)) for i in range(len(mu))])
             r = C * r
 
 
-def projection(f, x0, e1 = -10,e=10 ** -8, max_iter=100):
+def projection(f, x0, e1=-10, e=10 ** -8, max_iter=100):
     x = x0
     k = 0
     case = 0
-    deltax = numpy.array([0.0001,0.0001,0.0001,0.0001])
+    deltax = numpy.array([0.0001, 0.0001, 0.0001, 0.0001])
     g = constraints()
     dg = prime_constraints()
-    gradf = prime_rosenbrock(30,2)
+    gradf = prime_rosenbrock(30, 2)
     id = numpy.eye(5)
     numpy.delete(id, 4)
 
@@ -249,7 +246,7 @@ def main():
     target = numpy.array([1, 1, 1, 1])
     # print(numpy.array([g(target) for g in prime_constraints()]))
     x0 = numpy.array([0.7, 0.7, 0.7, 0.7])
-    f = rosenbrock(30,2,80)
+    f = rosenbrock(30, 2, 80)
     # pen = penalty_functions(x0)
     # print(numpy.abs(pen[0]), pen[1], f(pen[0]))
     # bar = barier_functions(x0)
@@ -259,7 +256,7 @@ def main():
     # l = lagr(x0)
     # print(numpy.abs(l[0]), l[1], f(l[0]))
 
-    proj = barier_functions(numpy.array([3,2,3,5]))
+    proj = barier_functions(numpy.array([3, 2, 3, 5]))
     print(proj, f(proj[0]))
 
 

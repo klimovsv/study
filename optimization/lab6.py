@@ -54,6 +54,7 @@ def simplex(A, c, b, b_idx, eps=10 ** -3):
 
         b_idx[p_ind] = q
         n_idx[q_ind] = p
+    return None, None
 
 
 def get_basis(A, c, b):
