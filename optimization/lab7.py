@@ -8,8 +8,8 @@ import lab5
 
 
 def minimize(f, x0):
-    return scipy.optimize.minimize(f,x0,method='CG').x
-    # return lab5.penalty_functions(x0, f)[0]
+    return scipy.optimize.minimize(f, x0, method='CG').x
+    # return lab5.penalty_functions(x0, f, cons=[])[0]
 
 
 def dist(x1, x2):
@@ -113,7 +113,7 @@ def main():
     A = np.array([[0, 2, 5],
                   [2, 3, 5],
                   [1, 6, 7]])
-    f_arr = np.array([1/6, 2/6, 3/6])
+    f_arr = np.array([1 / 6, 2 / 6, 3 / 6])
     f = shekel(a, b, c, A, f_arr)
 
     K = 200

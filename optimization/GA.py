@@ -4,6 +4,28 @@ import operator
 from itertools import product
 
 
+def fun(x):
+    n = 6
+    c = lambda i: i
+    a = lambda i, j: c(i) / (2 * j)
+    p = lambda i, j: math.pow(a(i, j), -2)
+    return -1. * math.fsum(
+        [
+            c(i)
+            * math.exp(
+                -1.
+                * math.fsum(
+                    [
+                        a(i, j) * math.pow(x[j - 1] - p(i, j), 2)
+                        for j in range(1, n + 1)
+                    ]
+                )
+            )
+            for i in range(1, 4)
+        ]
+    )
+
+
 def f(x):
     return sum(map(lambda v: v ** 2 - 10 * math.cos(2 * v * math.pi) + 10, x))
 
@@ -16,24 +38,26 @@ def cross(ind1, ind2):
 
 
 def selection(population, cropsize):
-    return population[:cropsize//4]
+    return population[:cropsize // 4]
 
 
 def mutate_function(alpha, beta):
     def f(individual):
+        pow_factor = 12
         new_ind = np.copy(individual)
         for i in range(len(individual)):
             factor = np.random.rand()
             if np.random.randint(0, 2) == 0:
-                new_ind[i] -= (new_ind[i] - alpha) * factor ** 15
+                new_ind[i] -= (new_ind[i] - alpha) * factor ** pow_factor
             else:
-                new_ind[i] += (beta - new_ind[i]) * factor ** 15
+                new_ind[i] += (beta - new_ind[i]) * factor ** pow_factor
         return new_ind
 
     return f
 
 
-def ga(fit, crossover, mutation, selection, n=3, crop=100, epoch=1000, alpha=0, beta=20):
+def ga(fit, crossover=cross, mutation=mutate_function(0, 20), selection=selection, n=3, crop=100, epoch=1000, alpha=0,
+       beta=20):
     initial_individuals = np.random.uniform(low=alpha, high=beta, size=(crop, n))
     population = [(x, fit(x)) for x in initial_individuals]
     population.sort(key=operator.itemgetter(1))
@@ -56,29 +80,28 @@ def ga(fit, crossover, mutation, selection, n=3, crop=100, epoch=1000, alpha=0, 
             parent_pairs += list(product([p], parents[:i] + parents[i + 1:]))
 
         childs = []
-        for pair in parent_pairs:
-            p1, p2 = pair
+        for p1, p2 in parent_pairs:
             ch1, ch2 = crossover(p1[0], p2[0])
-            childs.append((ch1, f(ch1)))
-            childs.append((ch2, f(ch2)))
+            childs.append((ch1, fit(ch1)))
+            childs.append((ch2, fit(ch2)))
 
         # mutation
         mutation_list = list(filter(lambda individual: np.random.rand() < pmut, population[:int(pop_len * pmut)]))
         for i, individual in enumerate(mutation_list):
             mutated = mutation(individual[0])
-            mutation_list[i] = (mutated, f(mutated))
+            mutation_list[i] = (mutated, fit(mutated))
 
         population += mutation_list + childs
         population.sort(key=operator.itemgetter(1))
-
+        # print(population[0])
     return population[0]
 
 
-
-
-
 def main():
-    x = ga(f, cross, mutate_function(0, 20), selection)
+    # x = ga(f)
+    # print(x)
+    mut = mutate_function(1, 10)
+    x = ga(fun, alpha=1, beta=10, mutation=mut, n=6)
     print(x)
 
 

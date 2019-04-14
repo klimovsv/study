@@ -124,11 +124,10 @@ def mixed(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8):
             r = r * C
 
 
-def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8):
+def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8, cons=constraints()):
     r = 0.5
     C = 10
     k = 0
-    cons = constraints()
 
     x0 = x0.tolist()
     while True:
@@ -136,10 +135,10 @@ def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8):
         bar = barier(r, cons)
         f = lambda x: func(x) - bar(x)
 
-        x0 = lab4_2.grad_descent(f, gradient(f), x0)
+        # x0 = lab4_2.grad_descent(f, gradient(f), x0)
         # x0 = lab4_1.hooke_jeeves(f, x0)
         # print(x0)
-        # x0 = scipy.optimize.minimize(f, x0, method='CG').x
+        x0 = scipy.optimize.minimize(f, x0, method='CG').x
 
         if abs(bar(x0)) <= eps:
             return x0, k
@@ -147,10 +146,9 @@ def barier_functions(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8):
             r = r / C
 
 
-def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8):
+def penalty_functions(x0, func=rosenbrock(30, 2, 80), eps=10 ** -8, cons=constraints()):
     r = 1
     C = 10
-    cons = []
     k = 0
     x0 = x0.tolist()
     while True:
