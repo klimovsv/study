@@ -46,21 +46,8 @@ def main():
         f1s.append(f1(x))
         f2s.append(f2(x))
 
-        # alpha = -1000
-        # beta = 1000
-        #
-        # mut = GA.mutate_function(alpha, beta)
-        # x = GA.ga(new_f, mutation=mut, alpha=alpha, beta=beta, epoch=1000)
-        # print(f1(x[0]), f2(x[0]))
     plt.scatter(f1s, f2s, color='lightblue', linewidth=3)
     plt.show()
-    # f = lambda x: f1(x) + f2(x)
-    # alpha = -10
-    # beta = 10
-    # mut = GA.mutate_function(alpha, beta)
-    # x = GA.ga(f, mutation=mut, alpha=alpha, beta=beta, epoch=1000)
-    # print(x)
-    # print(f(x[0]))
 
 
 if __name__ == '__main__':
