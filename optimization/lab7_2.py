@@ -2,6 +2,7 @@ import GA
 import lab5
 import numpy as np
 import scipy.optimize
+import matplotlib.pyplot as plt
 
 
 def f1(x):
@@ -33,29 +34,33 @@ def main():
     xf1 = lab5.barier_functions(x0, func=f1, cons=constraints())[0]
     xf2 = lab5.barier_functions(x0, func=f2, cons=constraints())[0]
     f_star = np.array([f1(xf1), f2(xf2)])
-    print(f_star)
 
     fs = [f1, f2]
-    for i in range(1, 10):
-        w = [i/10, 1 - i/10]
+    f1s = []
+    f2s = []
+    n = 50
+    for i in range(1, n):
+        w = [i/n, 1 - i/n]
         new_f = lambda x: sum([w[j] * (fs[j](x) - f_star[j]) for j in range(len(w))])
         x = lab5.barier_functions(x0, func=new_f, cons=constraints())[0]
-        print(f1(x), f2(x))
+        f1s.append(f1(x))
+        f2s.append(f2(x))
 
-        alpha = -1000
-        beta = 1000
-
-        mut = GA.mutate_function(alpha, beta)
-        x = GA.ga(new_f, mutation=mut, alpha=alpha, beta=beta, epoch=1000)
-        print(f1(x[0]), f2(x[0]))
-
-    f = lambda x: f1(x) + f2(x)
-    alpha = -10
-    beta = 10
-    mut = GA.mutate_function(alpha, beta)
-    x = GA.ga(f, mutation=mut, alpha=alpha, beta=beta, epoch=1000)
-    print(x)
-    print(f(x[0]))
+        # alpha = -1000
+        # beta = 1000
+        #
+        # mut = GA.mutate_function(alpha, beta)
+        # x = GA.ga(new_f, mutation=mut, alpha=alpha, beta=beta, epoch=1000)
+        # print(f1(x[0]), f2(x[0]))
+    plt.scatter(f1s, f2s, color='lightblue', linewidth=3)
+    plt.show()
+    # f = lambda x: f1(x) + f2(x)
+    # alpha = -10
+    # beta = 10
+    # mut = GA.mutate_function(alpha, beta)
+    # x = GA.ga(f, mutation=mut, alpha=alpha, beta=beta, epoch=1000)
+    # print(x)
+    # print(f(x[0]))
 
 
 if __name__ == '__main__':
