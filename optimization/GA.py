@@ -4,28 +4,6 @@ import operator
 from itertools import product
 
 
-def fun(x):
-    n = 6
-    c = lambda i: i
-    a = lambda i, j: c(i) / (2 * j)
-    p = lambda i, j: math.pow(a(i, j), -2)
-    return -1. * math.fsum(
-        [
-            c(i)
-            * math.exp(
-                -1.
-                * math.fsum(
-                    [
-                        a(i, j) * math.pow(x[j - 1] - p(i, j), 2)
-                        for j in range(1, n + 1)
-                    ]
-                )
-            )
-            for i in range(1, 4)
-        ]
-    )
-
-
 def f(x):
     return sum(map(lambda v: v ** 2 - 10 * math.cos(2 * v * math.pi) + 10, x))
 
@@ -58,7 +36,7 @@ def mutate_function(alpha, beta):
 
 def ga(fit, crossover=cross, mutation=mutate_function(0, 20), selection=selection, n=3, crop=100, epoch=1000, alpha=0,
        beta=20):
-    initial_individuals = np.random.uniform(low=alpha, high=beta, size=(crop, n))
+    initial_individuals = np.random.uniform(low=alpha, high=beta, size=(crop-1, n))
     population = [(x, fit(x)) for x in initial_individuals]
     population.sort(key=operator.itemgetter(1))
 
@@ -93,15 +71,12 @@ def ga(fit, crossover=cross, mutation=mutate_function(0, 20), selection=selectio
 
         population += mutation_list + childs
         population.sort(key=operator.itemgetter(1))
-        # print(population[0])
+
     return population[0]
 
 
 def main():
-    # x = ga(f)
-    # print(x)
-    mut = mutate_function(1, 10)
-    x = ga(fun, alpha=1, beta=10, mutation=mut, n=6)
+    x = ga(f)
     print(x)
 
 

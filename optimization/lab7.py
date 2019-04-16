@@ -52,9 +52,6 @@ class Cluster:
 
 
 def shekel(a, b, c, A, f):
-    # if sum(map(lambda x: 1 / x, f)) != -c:
-    #     raise Exception("initial params are wrong")
-
     def func(x):
         res = 0
         for i in range(A.shape[0]):
@@ -113,7 +110,7 @@ def main():
     A = np.array([[0, 2, 5],
                   [2, 3, 5],
                   [1, 6, 7]])
-    f_arr = np.array([1 / 6, 2 / 6, 3 / 6])
+    f_arr = np.array([2 / 6, 4 / 6, 6 / 6])
     f = shekel(a, b, c, A, f_arr)
 
     K = 200
