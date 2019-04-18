@@ -3,6 +3,8 @@ import operator
 
 
 def simplex(A, c, b, b_idx, eps=10 ** -3):
+    if b_idx is None:
+        return None, None
     k = 0
     max_iters = A.shape[0] * 5
     n_idx = [i for i in range(A.shape[1]) if i not in b_idx]
@@ -72,6 +74,10 @@ def get_basis(A, c, b):
     A = np.array(A)
     c = np.array(c)
     basis = simplex(A, c, b, [i + n for i in range(m)])[0]
+
+    if basis is None:
+        return basis
+
     return list(map(operator.itemgetter(0), filter(lambda x: x[1] != 0, enumerate(basis))))
 
 
@@ -98,5 +104,96 @@ def main():
     print(res)
 
 
+# node = (k,fval)
+def is_int(x):
+    return np.allclose(x - np.round(x), np.zeros(x.shape[0]))
+
+
+def branching(A, b, idx, x):
+    import math
+    newA1 = np.copy(A)
+    newb1 = np.copy(b)
+    newcons = np.zeros((1, newA1.shape[1]))
+    newcons[0][idx] = 1
+    newA1 = np.concatenate((newA1, newcons))
+    newb1 = np.concatenate((newb1, np.array([[math.floor(x[idx])]])))
+
+    newA2 = np.copy(A)
+    newb2 = np.copy(b)
+    newcons = np.zeros((1, newA2.shape[1]))
+    newcons[0][idx] = -1
+    newA2 = np.concatenate((newA2, newcons))
+    newb2 = np.concatenate((newb2, np.array([[-(math.floor(x[idx]) + 1)]])))
+
+    return newA1, newb1, newA2, newb2
+
+
+
+def lab62():
+    import scipy.optimize
+    two_step_simplex = lambda A, b, c: scipy.optimize.linprog(-c.reshape(-1), A_eq=A, b_eq=b.reshape(-1)).x
+
+    A = np.array([
+        [1., 3., 4., -1],
+        [2., 5., 1., 1.]
+    ])
+    c = np.array([[4., 2., -1., 0]])
+    b = np.array([
+        [23.],
+        [14.]
+    ])
+
+
+    k = 0
+    f = lambda x: (x @ c.transpose())[0]
+    x = two_step_simplex(A, b, c)
+
+    if x is None:
+        return None, None, None
+
+    f_val = f(x)
+
+    if is_int(x):
+        return x, f_val, k
+
+    q = [(f_val, x, A, b)]
+    xs = []
+    max_iters = 30
+    while q:
+        fs = [x[0] for x in q]
+        maxind = max(enumerate(fs))[0]
+
+        new_f, new_x, new_a, new_b = q.pop(maxind)
+
+        filtered = list(filter(lambda v: not abs(v[1] - round(v[1])) <= 10 ** -8, enumerate(new_x)))
+        if not filtered:
+            continue
+        idx = max(filtered, key=operator.itemgetter(0))[0]
+        A1, b1, A2, b2 = branching(new_a, new_b, idx, new_x)
+
+        x = two_step_simplex(A1, b1, c)
+        if not x is None:
+            if is_int(x):
+                xs.append(x)
+            q.append((f(x), x, A, b))
+
+        x = two_step_simplex(A2, b2, c)
+        if not x is None:
+            if is_int(x):
+                xs.append(x)
+            q.append((f(x), x, A, b))
+
+        if k > max_iters:
+            break
+
+        k += 1
+
+    if len(xs) == 0:
+        return None, None, k
+    maxx = max(xs, key=f)
+    return maxx, f(maxx), k
+
+
 if __name__ == "__main__":
-    main()
+    # main()
+    print(lab62())
