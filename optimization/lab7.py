@@ -110,7 +110,7 @@ def main():
     A = np.array([[0, 2, 5],
                   [2, 3, 5],
                   [1, 6, 7]])
-    f_arr = np.array([2 / 6, 4 / 6, 6 / 6])
+    f_arr = np.array([2 / 6, 18/ 6, 12/ 6])
     f = shekel(a, b, c, A, f_arr)
 
     K = 200
