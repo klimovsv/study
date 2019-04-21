@@ -47,7 +47,9 @@ def main():
         f2s.append(f2(x))
 
     plt.scatter(f1s, f2s, color='lightblue', linewidth=3)
-    plt.show()
+    plt.xlabel("f1")
+    plt.ylabel("f2")
+    plt.savefig("lab72.png")
 
 
 if __name__ == '__main__':
