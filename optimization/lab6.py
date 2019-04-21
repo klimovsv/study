@@ -104,7 +104,7 @@ def main():
     print(res)
 
 
-# node = (k,fval)
+
 def is_int(x):
     return np.allclose(x - np.round(x), np.zeros(x.shape[0]))
 
@@ -134,27 +134,26 @@ def lab62():
     two_step_simplex = lambda A, b, c: scipy.optimize.linprog(-c.reshape(-1), A_eq=A, b_eq=b.reshape(-1)).x
 
     A = np.array([
-        [1., 3., 4., -1],
-        [2., 5., 1., 1.]
+        [2, 1, 3, 0],
+        [3, 1, 0, 1]
     ])
-    c = np.array([[4., 2., -1., 0]])
+    c = np.array([[3, 4, -10, 0]])
     b = np.array([
-        [23.],
-        [14.]
+        [24],
+        [12]
     ])
-
 
     k = 0
     f = lambda x: (x @ c.transpose())[0]
     x = two_step_simplex(A, b, c)
 
-    if x is None:
+    if np.isnan(x).any():
         return None, None, None
 
     f_val = f(x)
 
     if is_int(x):
-        return x, f_val, k
+        return x, f_val, 1
 
     q = [(f_val, x, A, b)]
     xs = []
@@ -172,13 +171,13 @@ def lab62():
         A1, b1, A2, b2 = branching(new_a, new_b, idx, new_x)
 
         x = two_step_simplex(A1, b1, c)
-        if not x is None:
+        if not np.isnan(x).any():
             if is_int(x):
                 xs.append(x)
             q.append((f(x), x, A, b))
 
         x = two_step_simplex(A2, b2, c)
-        if not x is None:
+        if not np.isnan(x).any():
             if is_int(x):
                 xs.append(x)
             q.append((f(x), x, A, b))
